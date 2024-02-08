@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Account Consumption</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.6.2/dist/full.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="octopus.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100">
+    <form id="consumptionForm" class="p-4">
+      <label for="account" class="text-gray-700">Account:</label><br />
+      <input
+        type="text"
+        id="account"
+        name="account"
+        class="input input-bordered mb-2"
+      /><br />
+      <label for="token" class="text-gray-700">Token:</label><br />
+      <input
+        type="text"
+        id="token"
+        name="token"
+        class="input input-bordered mb-2"
+      /><br />
+      <label for="period_from" class="text-gray-700">Period From:</label><br />
+      <input
+        type="text"
+        id="period_from"
+        name="period_from"
+        placeholder="2024-01-01T00:00:00Z"
+        class="input input-bordered mb-2"
+      /><br />
+      <label for="period_to" class="text-gray-700">Period To:</label><br />
+      <input
+        type="text"
+        id="period_to"
+        name="period_to"
+        placeholder="2024-01-01T00:00:00Z"
+        class="input input-bordered mb-2"
+      /><br />
+      <input type="submit" value="Submit" class="btn btn-active" />
+    </form>
+    <table id="results" class="table">
+    </table>
+
+    <script>
+      window.onload = function () {
+        const urlParams = new URLSearchParams(window.location.search)
+        document.getElementById('token').value = urlParams.get('token') || ''
+        document.getElementById('account').value =
+          urlParams.get('account') || ''
+        document.getElementById('period_from').value =
+          urlParams.get('period_from') || ''
+        document.getElementById('period_to').value =
+          urlParams.get('period_to') || ''
+      }
+
+      document
+        .getElementById('consumptionForm')
+        .addEventListener('submit', async function (e) {
+          e.preventDefault()
+          const token = document.getElementById('token').value
+          const account = document.getElementById('account').value
+          const period_from = document.getElementById('period_from').value
+          const period_to = document.getElementById('period_to').value
+          const results = await getAccountConsumption(
+            account,
+            token,
+            period_from,
+            period_to
+          )
+
+          // Clear the table
+          const table = document.getElementById('results')
+          table.innerHTML = `
+    <tr>
+      <th>Period</th>
+      <th>Kwh</th>
+      <th>Rate</th>
+      <th>Cost</th>
+      <th>Total Kwh</th>
+      <th>Total Cost</th>
+      <th>Average Rate</th>
+    </tr>
+  `
+
+          // Fill in the table with the results
+          for (const meterPoint of results) {
+            for (const [interval_start, data] of Object.entries(
+              meterPoint.data
+            )) {
+              const row = document.createElement('tr')
+              row.innerHTML = `
+        <td>${interval_start}</td>
+        <td>${data.kwh}</td>
+        <td>${data.rate}</td>
+        <td>${data.cost}</td>
+        <td>${data.totalKwh}</td>
+        <td>${data.totalCost}</td>
+        <td>${data.averageRate}</td>
+      `
+              table.appendChild(row)
+            }
+          }
+        })
+    </script>
+  </body>
+</html>
