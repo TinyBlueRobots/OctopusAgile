@@ -267,17 +267,13 @@ const onload = async (window, document) => {
   if (today.getHours() >= 16) {
     today.setDate(today.getDate() + 1)
   }
-  const calendar = new bulmaCalendar('#periodFrom', {
-    maxDate: today,
-    startDate: today,
-    dateFormat: 'yyyy-MM-dd',
-    onReady: async () => {
-      loadAccountForm(document)
-      loadRegionDropdown(window, document)
-      await renderChart(document)
-    }
-  })
-  calendar.on('hide', async () => {
+  loadAccountForm(document)
+  loadRegionDropdown(window, document)
+  const datePicker = document.getElementById('periodFrom')
+  datePicker.value = today.toISOString().slice(0, 10)
+  datePicker.max = today.toISOString().slice(0, 10)
+  datePicker.addEventListener('change', async () => {
     await renderChart(document)
   })
+  await renderChart(document)
 }

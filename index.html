@@ -4,22 +4,21 @@
 <head>
   <title>Octopus Agile Price & Consumption Tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-calendar@7.1.1/dist/css/bulma-calendar.min.css">
   <script src="octopus.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bulma-calendar@7.1.1/dist/js/bulma-calendar.min.js"></script>
   <style>
     html,
     header,
     section,
     footer,
     input[type="text"],
+    input[type="date"],
     .select,
     .box {
       background-color: rgb(16, 0, 48) !important
     }
 
-    .button {
+    .button, input {
       background-color: rgb(88, 64, 255) !important;
       color: azure !important;
     }
@@ -38,7 +37,7 @@
   <header class="is-size-1 has-text-centered">
     <h1>Octopus Agile Price & Consumption Tracker</h1>
   </header>
-  <main class="section box">
+  <main class="box">
     <input id="showSignInBtn" type="submit" value="Sign In" class="button is-pulled-right" />
     <input id="signOutBtn" type="submit" value="Sign Out" class="button is-hidden is-pulled-right" />
     <div class="field">
@@ -66,7 +65,7 @@
     </div>
     <div class="field">
       <label for="periodFrom" class="label">Day</label>
-      <input type="date" id="periodFrom" />
+      <input type="date" id="periodFrom" class="control" />
     </div>
     <div id="chart"></div>
   </main>
