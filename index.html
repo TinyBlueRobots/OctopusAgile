@@ -5,18 +5,18 @@
   <title>Octopus Agile Price & Consumption Tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-calendar@7.1.1/dist/css/bulma-calendar.min.css">
-  <script src="modals.js"></script>
   <script src="octopus.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   <script src="https://cdn.jsdelivr.net/npm/bulma-calendar@7.1.1/dist/js/bulma-calendar.min.js"></script>
   <style>
     html,
-    option,
-    input,
-    form,
+    header,
+    section,
     footer,
-    div {
-      background-color: #100030 !important
+    input[type="text"],
+    .select,
+    .box {
+      background-color: rgb(16, 0, 48) !important
     }
 
     .button {
@@ -36,65 +36,46 @@
 
 <body class="container">
   <header class="is-size-1 has-text-centered">
-    <h1 >Octopus Agile Price & Consumption Tracker</h1>
+    <h1>Octopus Agile Price & Consumption Tracker</h1>
   </header>
-  <main>
-    <div id="signInModal" class="modal">
-      <div class="modal-background"></div>
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">Sign in</p>
-          <button class="delete" aria-label="close"></button>
-        </header>
-        <section class="modal-card-body">
-          <label for="account" class="label">Account</label>
-          <input type="text" id="account" name="account" class="input input-bordered mb-2" />
-          <label for="token" class="label">Token</label>
-          <input type="text" id="token" name="token" class="input input-bordered mb-2" />
-        </section>
-        <footer class="modal-card-foot">
-          <div class="buttons">
-            <button id="signInBtn" class="button is-success">Ok</button>
-          </div>
-        </footer>
-      </div>
-    </div>
-    <div class="box">
-      <input id="showSignInBtn" type="submit" value="Sign In" class="button is-pulled-right" />
-      <input id="signOutBtn" type="submit" value="Sign Out" class="button is-hidden is-pulled-right" />
-      <div class="field">
-        <label class="label">Region</label>
-        <div class="control">
-          <div class="select">
-            <select id="region" class="has-background-inherit">
-              <option value="A" selected>Eastern England</option>
-              <option value="B">East Midlands</option>
-              <option value="C">London</option>
-              <option value="D">North Wales, Merseyside and Cheshire</option>
-              <option value="E">West Midlands</option>
-              <option value="F">North East England</option>
-              <option value="G">North West England</option>
-              <option value="H">Southern England</option>
-              <option value="J">South East England</option>
-              <option value="K">South Wales</option>
-              <option value="L">South West England</option>
-              <option value="M">Yorkshire</option>
-              <option value="N">Southern Scotland</option>
-              <option value="P">Northern Scotland</option>
-            </select>
-          </div>
+  <main class="section box">
+    <input id="showSignInBtn" type="submit" value="Sign In" class="button is-pulled-right" />
+    <input id="signOutBtn" type="submit" value="Sign Out" class="button is-hidden is-pulled-right" />
+    <div class="field">
+      <label class="label">Region</label>
+      <div class="control">
+        <div class="select">
+          <select id="region" class="has-background-inherit">
+            <option value="A" selected>Eastern England</option>
+            <option value="B">East Midlands</option>
+            <option value="C">London</option>
+            <option value="D">North Wales, Merseyside and Cheshire</option>
+            <option value="E">West Midlands</option>
+            <option value="F">North East England</option>
+            <option value="G">North West England</option>
+            <option value="H">Southern England</option>
+            <option value="J">South East England</option>
+            <option value="K">South Wales</option>
+            <option value="L">South West England</option>
+            <option value="M">Yorkshire</option>
+            <option value="N">Southern Scotland</option>
+            <option value="P">Northern Scotland</option>
+          </select>
         </div>
       </div>
-      <div class="field">
-        <label for="period_from" class="label">Day</label>
-        <input type="date" id="period_from" />
-      </div>
-      <div id="chart"></div>
     </div>
+    <div class="field">
+      <label for="periodFrom" class="label">Day</label>
+      <input type="date" id="periodFrom" />
+    </div>
+    <div id="chart"></div>
   </main>
   <footer class="footer">
-    <div class="content has-text-centered box">
-      This site is not affiliated with Octopus Energy. It uses the <a href="https://developer.octopus.energy" target="_blank">Octopus Energy API</a> to display Agile tariff prices and consumption data.
+    <div class="has-text-centered box">
+      This site is not affiliated with Octopus Energy. It uses the <a href="https://developer.octopus.energy"
+        target="_blank">Octopus Energy API</a> to display Agile tariff prices and consumption data.
+      <br />
+      Sign in to see your consumption data. Your account and token will only be stored in your browser's local storage.
     </div>
   </footer>
   <script>
@@ -102,6 +83,26 @@
       onload(window, document)
     }
   </script>
+  <div id="signInModal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Sign in</p>
+        <button class="delete" aria-label="close"></button>
+      </header>
+      <section class="modal-card-body">
+        <label for="account" class="label">Account</label>
+        <input type="text" id="account" name="account" class="input" />
+        <label for="token" class="label">Token</label>
+        <input type="text" id="token" name="token" class="input" />
+      </section>
+      <footer class="modal-card-foot">
+        <div class="buttons">
+          <button id="signInBtn" class="button is-success">Ok</button>
+        </div>
+      </footer>
+    </div>
+  </div>
 </body>
 
 </html>

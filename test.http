@@ -1,0 +1,28 @@
+@root = https://api.octopus.energy/v1
+@accountId = A-B8F15377
+@token = 
+@period_from = 2024-12-01
+@period_to = 2024-12-02
+
+###
+# @name products
+GET {{root}}/products
+
+###
+# @name product
+GET {{products.response.body.$.results[0].links[0].href}}
+
+###
+# @name region
+GET {{product.response.body.$.single_register_electricity_tariffs['_A'].direct_debit_monthly.links[1].href}}?period_from={{period_from}}&period_to={{period_to}}
+
+###
+# @name account
+GET {{root}}/accounts/{{accountId}}
+Authorization: Basic {{token}}
+
+###
+# @name mpan
+GET {{root}}/electricity-meter-points/{{account.response.body.$.properties[0].electricity_meter_points[0].mpan}}/meters/{{account.response.body.$.properties.[0].electricity_meter_points.[0].meters[1].serial_number}}/consumption?period_from={{period_from}}&period_to={{period_to}}
+Authorization: Basic {{token}}
+

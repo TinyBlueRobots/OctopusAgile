@@ -19,10 +19,10 @@ let existingChart
 
 const apiRoot = 'https://api.octopus.energy/v1/'
 
-const getPeriodTo = (period_from) => {
-  const period_to = new Date(period_from)
-  period_to.setDate(period_to.getDate() + 1)
-  return period_to
+const getPeriodTo = (periodFrom) => {
+  const periodTo = new Date(periodFrom)
+  periodTo.setDate(periodTo.getDate() + 1)
+  return periodTo
 }
 
 const getData = async (path, token) => {
@@ -31,8 +31,8 @@ const getData = async (path, token) => {
   return response.ok ? await response.json() : null
 }
 
-const getConsumption = async (account, token, period_from) => {
-  const period_to = getPeriodTo(period_from)
+const getConsumption = async (account, token, periodFrom) => {
+  const period_to = getPeriodTo(periodFrom)
   const accountData = await getData(`${apiRoot}accounts/${account}/`, token)
   if (!accountData) return null
   const meterPoints = accountData.properties
@@ -44,7 +44,7 @@ const getConsumption = async (account, token, period_from) => {
       const consumptionData = await getData(
         `${apiRoot}electricity-meter-points/${meterPoint.mpan}/meters/${
           meter.serial_number
-        }/consumption?period_from=${period_from.toISOString()}&period_to=${period_to.toISOString()}`,
+        }/consumption?period_from=${periodFrom.toISOString()}&period_to=${period_to.toISOString()}`,
         token
       )
       if (consumptionData && consumptionData.results.length) {
@@ -58,8 +58,8 @@ const getConsumption = async (account, token, period_from) => {
   return meterConsumption
 }
 
-const getRates = async (region, period_from) => {
-  const period_to = getPeriodTo(period_from)
+const getRates = async (region, periodFrom) => {
+  const periodTo = getPeriodTo(periodFrom)
   const tariffs = await getData(`${apiRoot}products/`)
   const agileTariffDataHref = tariffs.results
     .find(
@@ -75,7 +75,7 @@ const getRates = async (region, period_from) => {
     ].direct_debit_monthly.links.find(
       (link) => link.rel === 'standard_unit_rates'
     ).href +
-    `?period_from=${period_from.toISOString()}&period_to=${period_to.toISOString()}`
+    `?period_from=${periodFrom.toISOString()}&period_to=${periodTo.toISOString()}`
   const regionUnitRates = await getData(regionUnitRatesHref)
   return regionUnitRates.results.map(({ valid_from, value_inc_vat }) => ({
     valid_from,
@@ -106,8 +106,8 @@ const formatter = new Intl.DateTimeFormat('en-GB', {
   year: 'numeric'
 })
 
-const createChartOptions = async (region, period_from, consumption) => {
-  const rates = await getRates(region, period_from)
+const createChartOptions = async (region, periodFrom, consumption) => {
+  const rates = await getRates(region, periodFrom)
   const results = rates.reverse()
   const prices = results.map((rate) => rate.value_inc_vat.toFixed(2))
   const series = [{ name: 'Price', data: prices }]
@@ -120,6 +120,12 @@ const createChartOptions = async (region, period_from, consumption) => {
         data: consumptionCosts.map((cost) => cost.toFixed(2))
       })
     }
+  }
+  if (!Object.keys(consumption).length) {
+    series.push({
+      name: 'Meter data not available',
+      data: Array(prices.length).fill(0)
+    })
   }
   const dates = results.map((rate) => rate.valid_from)
   const times = dates.map((date) => date.slice(11, 16))
@@ -150,7 +156,7 @@ const createChartOptions = async (region, period_from, consumption) => {
       curve: 'straight'
     },
     title: {
-      text: formatter.format(period_from),
+      text: formatter.format(periodFrom),
       align: 'center',
       style: {
         color: 'azure'
@@ -176,7 +182,8 @@ const createChartOptions = async (region, period_from, consumption) => {
   return options
 }
 
-const renderChart = async (document, period_from) => {
+const renderChart = async (document) => {
+  const periodFrom = new Date(document.getElementById('periodFrom').value)
   document.body.style.cursor = 'wait'
   const chartElement = document.getElementById('chart')
   let consumption
@@ -184,12 +191,12 @@ const renderChart = async (document, period_from) => {
     consumption = await getConsumption(
       localStorage.getItem('account'),
       localStorage.getItem('token'),
-      period_from
+      periodFrom
     )
   }
   const chartOptions = await createChartOptions(
     document.getElementById('region').value,
-    period_from,
+    periodFrom,
     consumption
   )
   if (!existingChart) {
@@ -201,7 +208,7 @@ const renderChart = async (document, period_from) => {
   document.body.style.cursor = 'default'
 }
 
-const toggleAccountForm = (document) => {
+const toggleAccountButtons = (document) => {
   document.getElementById('showSignInBtn').classList.toggle('is-hidden')
   document.getElementById('signOutBtn').classList.toggle('is-hidden')
 }
@@ -213,7 +220,8 @@ const loadAccountForm = (document) => {
   document.getElementById('signOutBtn').addEventListener('click', async () => {
     localStorage.removeItem('account')
     localStorage.removeItem('token')
-    toggleAccountForm(document)
+    toggleAccountButtons(document)
+    await renderChart(document)
   })
 
   Array.from(document.getElementsByClassName('delete')).forEach((e) => {
@@ -223,7 +231,7 @@ const loadAccountForm = (document) => {
   })
 
   if (account && token) {
-    toggleAccountForm(document)
+    toggleAccountButtons(document)
   }
 
   document
@@ -238,44 +246,38 @@ const loadAccountForm = (document) => {
     if (account && token) {
       localStorage.setItem('account', account)
       localStorage.setItem('token', token)
-      toggleAccountForm(document)
+      toggleAccountButtons(document)
       document.getElementById('signInModal').classList.toggle('is-active')
+      await renderChart(document)
     }
   })
 }
 
 const loadRegionDropdown = (window, document) => {
-  const urlParams = new URLSearchParams(window.location.search)
-  document.getElementById('region').value = urlParams.get('region') || 'A'
-  document.getElementById('region').addEventListener('change', async () => {
-    const urlParams = new URLSearchParams(window.location.search)
-    urlParams.set('region', document.getElementById('region').value)
-    window.history.replaceState(
-      {},
-      '',
-      `${window.location.pathname}?${urlParams}`
-    )
+  const element = document.getElementById('region')
+  element.value = localStorage.getItem('region') || 'A'
+  element.addEventListener('change', async () => {
+    localStorage.setItem('region', element.value)
     await renderChart(document)
   })
 }
 
 const onload = async (window, document) => {
   const today = new Date()
-  const tomorrow = new Date()
-  tomorrow.setDate(tomorrow.getDate() + 1)
-  const calendar = bulmaCalendar.attach('[type="date"]', {
-    maxDate: tomorrow,
+  if (today.getHours() >= 16) {
+    today.setDate(today.getDate() + 1)
+  }
+  const calendar = new bulmaCalendar('#periodFrom', {
+    maxDate: today,
     startDate: today,
     dateFormat: 'yyyy-MM-dd',
-    onReady: async (calendar) => {
-      const period_from = new Date(calendar.data.value())
+    onReady: async () => {
       loadAccountForm(document)
       loadRegionDropdown(window, document)
-      await renderChart(document, period_from)
+      await renderChart(document)
     }
-  })[0]
-  calendar.on('hide', async (calendar) => {
-    const period_from = new Date(calendar.data.value())
-    await renderChart(document, period_from)
+  })
+  calendar.on('hide', async () => {
+    await renderChart(document)
   })
 }
