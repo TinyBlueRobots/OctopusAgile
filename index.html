@@ -18,7 +18,8 @@
       background-color: rgb(16, 0, 48) !important
     }
 
-    .button, input {
+    .button,
+    input {
       background-color: rgb(88, 64, 255) !important;
       color: azure !important;
     }
@@ -34,8 +35,8 @@
 </head>
 
 <body class="container">
-  <header class="is-size-1 has-text-centered">
-    <h1>Octopus Agile Price & Consumption Tracker</h1>
+  <header>
+    <h1 class="title has-text-centered">Octopus Agile Price & Consumption Tracker</h1>
   </header>
   <main class="box">
     <input id="showSignInBtn" type="submit" value="Sign In" class="button is-pulled-right" />
@@ -64,7 +65,7 @@
       </div>
     </div>
     <div class="field">
-      <label for="periodFrom" class="label">Day</label>
+      <label for="periodFrom" class="label">Date</label>
       <input type="date" id="periodFrom" class="control" />
     </div>
     <div id="chart"></div>
