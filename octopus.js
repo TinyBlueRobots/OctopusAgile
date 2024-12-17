@@ -98,17 +98,11 @@ const getConsumptionCosts = async (rates, consumption) => {
   return consumption
 }
 
-const formatter = new Intl.DateTimeFormat('en-GB', {
-  weekday: 'short',
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric'
-})
-
 const createChartOptions = async (region, periodFrom, consumption) => {
-  const rates = await getRates(region, periodFrom)
-  const results = rates.reverse()
-  const prices = results.map((rate) => rate.value_inc_vat.toFixed(2))
+  const rates = await getRates(region, periodFrom).then((rates) =>
+    rates.reverse()
+  )
+  const prices = rates.map((rate) => rate.value_inc_vat.toFixed(2))
   const series = [{ name: 'Price', data: prices }]
   consumption = consumption ? await getConsumptionCosts(rates, consumption) : {}
   for (const serial_number of Object.keys(consumption)) {
@@ -126,8 +120,33 @@ const createChartOptions = async (region, periodFrom, consumption) => {
       data: Array(prices.length).fill(0)
     })
   }
-  const dates = results.map((rate) => rate.valid_from)
-  const times = dates.map((date) => date.slice(11, 16))
+  const times = rates.map((rate) => rate.valid_from.slice(11, 16))
+  let annotations = { xaxis: [] }
+  console.log(periodFrom.toDateString(), new Date().toDateString())
+  if (periodFrom.toDateString() === new Date().toDateString()) {
+    const nextRateTime = rates.find(
+      (rate) => new Date(rate.valid_from) > new Date()
+    )
+    const currentRate = rates[rates.indexOf(nextRateTime) - 1]
+    annotations = {
+      xaxis: [
+        {
+          x: currentRate.valid_from.slice(11, 16),
+          strokeDashArray: 0,
+          borderColor: 'azure',
+          label: {
+            borderColor: 'azure',
+            style: {
+              color: 'azure',
+              background: 'rgb(250, 152, 255)'
+            },
+            text: currentRate.value_inc_vat
+          }
+        }
+      ]
+    }
+  }
+  console.log(annotations)
   const options = {
     colors: ['rgb(250, 152, 255)', 'rgb(16, 195, 149)'],
     series,
@@ -152,10 +171,11 @@ const createChartOptions = async (region, periodFrom, consumption) => {
       strokeDashArray: 3
     },
     stroke: {
-      curve: 'straight'
+      curve: 'straight',
+      width: 2
     },
     title: {
-      text: formatter.format(periodFrom),
+      text: periodFrom.toDateString(),
       align: 'center',
       style: {
         color: 'azure'
@@ -175,7 +195,8 @@ const createChartOptions = async (region, periodFrom, consumption) => {
           colors: 'azure'
         }
       }
-    }
+    },
+    annotations: annotations
   }
 
   return options
