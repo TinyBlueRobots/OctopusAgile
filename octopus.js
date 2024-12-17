@@ -15,14 +15,8 @@ const regionMap = {
   P: 'Northern Scotland'
 }
 
-let existingChart
+let chartInstance
 const apiRoot = 'https://api.octopus.energy/v1/'
-
-const setRegion = async (region) => {
-  if (region) {
-    localStorage.setItem('region', region)
-  }
-}
 
 const getPeriodTo = (periodFrom) => {
   const periodTo = new Date(periodFrom)
@@ -188,7 +182,6 @@ const createChartOptions = async (region, periodFrom, consumption) => {
 }
 
 const renderChart = async (chartElement, periodFromStr, region) => {
-  console.log('renderChart', periodFromStr, region)
   const periodFrom = new Date(periodFromStr)
   document.body.style.cursor = 'wait'
   let consumption
@@ -200,11 +193,11 @@ const renderChart = async (chartElement, periodFromStr, region) => {
     )
   }
   const chartOptions = await createChartOptions(region, periodFrom, consumption)
-  if (!existingChart) {
-    existingChart = new ApexCharts(chartElement, chartOptions)
-    await existingChart.render()
+  if (!chartInstance) {
+    chartInstance = new ApexCharts(chartElement, chartOptions)
+    await chartInstance.render()
   } else {
-    existingChart.updateOptions(chartOptions)
+    chartInstance.updateOptions(chartOptions)
   }
   document.body.style.cursor = 'default'
 }
@@ -227,7 +220,7 @@ const getSignedIn = () => {
   return localStorage.getItem('account') && localStorage.getItem('token')
 }
 
-const loadDatePicker = (element) => {
+const loadPeriodFrom = (element) => {
   const periodFrom = new Date()
   if (periodFrom.getHours() >= 16) {
     periodFrom.setDate(periodFrom.getDate() + 1)
@@ -237,14 +230,19 @@ const loadDatePicker = (element) => {
   return element.value
 }
 
-const loadRegionSelect = (element) => {
+const loadRegion = (element) => {
   element.value = localStorage.getItem('region') || 'A'
-  // element.dispatchEvent(new Event('change'));
   return element.value
 }
 
+const setRegion = async (region) => {
+  if (region) {
+    localStorage.setItem('region', region)
+  }
+}
+
 const onload = (chartElement, regionElement, datePickerElement) => {
-  const periodFrom = loadDatePicker(datePickerElement)
-  const region = loadRegionSelect(regionElement)
+  const periodFrom = loadPeriodFrom(datePickerElement)
+  const region = loadRegion(regionElement)
   renderChart(chartElement, periodFrom, region)
 }
