@@ -277,4 +277,21 @@ const onload = (chartElement, regionElement, datePickerElement) => {
   const periodFrom = loadPeriodFrom(datePickerElement)
   const region = loadRegion(regionElement)
   renderRatesChart(chartElement, periodFrom, region)
+  const nextInterval = (() => {
+    const now = new Date()
+    const nextInterval = new Date()
+    nextInterval.setSeconds(0)
+    nextInterval.setMinutes(now.getMinutes() < 30 ? 30 : 60)
+    return nextInterval - now
+  })()
+  setTimeout(() => {
+    const periodFrom = datePickerElement.value
+    const region = regionElement.value
+    renderRatesChart(chartElement, periodFrom, region)
+    setInterval(() => {
+      const periodFrom = datePickerElement.value
+      const region = regionElement.value
+      renderRatesChart(chartElement, periodFrom, region)
+    }, 1800000)
+  }, nextInterval)
 }
