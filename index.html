@@ -3,10 +3,8 @@
 
 <head>
   <title>Octopus Agile Price & Consumption Tracker</title>
-  <meta name="description"
-    content="Track Octopus Agile prices and your energy consumption with our easy-to-use tracker.">
-  <meta name="keywords"
-    content="Octopus Energy, Agile Prices, Energy Consumption, Energy Tracker, Octopus Agile, Energy Prices, Consumption Tracker">
+  <meta name="description" content="Track Octopus Agile prices and your energy consumption with our easy-to-use tracker.">
+  <meta name="keywords" content="Octopus Energy, Agile Prices, Energy Consumption, Energy Tracker, Octopus Agile, Energy Prices, Consumption Tracker">
   <meta name="author" content="Tiny Blue Robots">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
   <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script>
@@ -45,8 +43,7 @@
   <header class="section">
     <h1 class="title has-text-centered">Octopus Agile Price & Consumption Tracker</h1>
   </header>
-  <main class="box has-background-inherit" data-signals-signinmodalactive="false" data-signals-signedin="true"
-    data-computed-accountname="signedin.value && getAccount(signedin.value)">
+  <main class="box has-background-inherit" data-signals-signinmodalactive="false" data-signals-accountname="false">
     <div class="columns">
       <div class="column is-11">
         <div class="field">
@@ -74,8 +71,7 @@
         </div>
         <div class="field">
           <label for="periodFrom" class="label">Date</label>
-          <input id="periodFrom" type="date" data-ref-periodfrom class="button has-background-inherit"
-            data-on-change="renderCharts()" />
+          <input id="periodFrom" type="date" data-ref-periodfrom class="button has-background-inherit" data-on-change="renderCharts()" />
         </div>
       </div>
       <div class="column">
@@ -83,12 +79,8 @@
           <label for="accountName" class="label">Account</label>
           <span id="accountName" data-text="accountname.value"></span>
         </div>
-        <button class="button" data-class-is-hidden="accountname.value"
-          data-on-click="signinmodalactive.value = true">Sign
-          In</button>
-        <button class="button" data-class-is-hidden="!accountname.value"
-          data-on-click="signOut(); signedin.value = false; renderCharts()">Sign
-          Out</button>
+        <button class="button" data-class-is-hidden="accountname.value" data-on-click="signinmodalactive.value = true">Sign In</button>
+        <button class="button" data-class-is-hidden="!accountname.value" data-on-click="signOut(); accountname.value = false; renderCharts()">Sign Out</button>
       </div>
     </div>
     <div data-ref-rateschart></div>
@@ -98,17 +90,13 @@
   <footer class="footer has-background-inherit">
     <div class="has-text-centered box has-background-inherit">
       <p>
-        Not on Agile? <a href="https://share.octopus.energy/rich-moon-324" target="_blank">Switch to Octopus Energy</a>
-        and get £50 credit.
+        Not on Agile? <a href="https://share.octopus.energy/rich-moon-324" target="_blank">Switch to Octopus Energy</a> and get £50 credit.
       </p>
       <p>
-        This site is not affiliated with Octopus Energy. It uses the <a href="https://developer.octopus.energy"
-          target="_blank">Octopus Energy API</a> to display Agile tariff prices and consumption data.
+        This site is not affiliated with Octopus Energy. It uses the <a href="https://developer.octopus.energy" target="_blank">Octopus Energy API</a> to display Agile tariff prices and consumption data.
       </p>
       <p data-class-is-hidden="accountname.value">
-        <a href="#" data-on-click="signinmodalactive.value = true">Sign in</a> to see your consumption data. Your
-        account and token will only be stored in your browser's local
-        storage.
+        <a href="#" data-on-click="signinmodalactive.value = true">Sign in</a> to see your consumption data. Your account and token will only be stored in your browser's local storage.
       </p>
       <p>
         Built by <a href="https://tinybluerobots.com" target="_blank">Tiny Blue Robots</a>.
@@ -130,8 +118,7 @@
       </section>
       <footer class="modal-card-foot">
         <div class="buttons">
-          <button class="button"
-            data-on-click="signedin.value = signIn(account.value, token.value); signinmodalactive.value = false; renderCharts()">Ok</button>
+          <button class="button" data-on-click="signIn(account.value, token.value).then(value => accountname.value = value).then(() => signinmodalactive.value = !accountname.value).then(() => renderCharts())">Ok</button>
           <button class="button" data-on-click="signinmodalactive.value = false">Cancel</button>
         </div>
       </footer>
