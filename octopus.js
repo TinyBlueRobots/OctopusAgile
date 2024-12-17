@@ -137,6 +137,7 @@ const createChartOptions = async (region, periodFrom, consumption) => {
           label: {
             borderColor: 'azure',
             style: {
+              fontSize: '14px',
               color: 'azure',
               background: 'rgb(250, 152, 255)'
             },
@@ -146,7 +147,6 @@ const createChartOptions = async (region, periodFrom, consumption) => {
       ]
     }
   }
-  console.log(annotations)
   const options = {
     colors: ['rgb(250, 152, 255)', 'rgb(16, 195, 149)'],
     series,
@@ -154,7 +154,7 @@ const createChartOptions = async (region, periodFrom, consumption) => {
       height: '100%',
       type: 'line',
       zoom: {
-        enabled: false
+        enabled: true
       }
     },
     legend: {
