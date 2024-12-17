@@ -15,8 +15,7 @@ const regionMap = {
   P: 'Northern Scotland'
 }
 
-let existingChart
-
+let chartInstance
 const apiRoot = 'https://api.octopus.energy/v1/'
 
 const getPeriodTo = (periodFrom) => {
@@ -182,10 +181,9 @@ const createChartOptions = async (region, periodFrom, consumption) => {
   return options
 }
 
-const renderChart = async (document) => {
-  const periodFrom = new Date(document.getElementById('periodFrom').value)
+const renderChart = async (chartElement, periodFromStr, region) => {
+  const periodFrom = new Date(periodFromStr)
   document.body.style.cursor = 'wait'
-  const chartElement = document.getElementById('chart')
   let consumption
   if (localStorage.getItem('account')) {
     consumption = await getConsumption(
@@ -194,86 +192,57 @@ const renderChart = async (document) => {
       periodFrom
     )
   }
-  const chartOptions = await createChartOptions(
-    document.getElementById('region').value,
-    periodFrom,
-    consumption
-  )
-  if (!existingChart) {
-    existingChart = new ApexCharts(chartElement, chartOptions)
-    await existingChart.render()
+  const chartOptions = await createChartOptions(region, periodFrom, consumption)
+  if (!chartInstance) {
+    chartInstance = new ApexCharts(chartElement, chartOptions)
+    await chartInstance.render()
   } else {
-    existingChart.updateOptions(chartOptions)
+    chartInstance.updateOptions(chartOptions)
   }
   document.body.style.cursor = 'default'
 }
 
-const toggleAccountButtons = (document) => {
-  document.getElementById('showSignInBtn').classList.toggle('is-hidden')
-  document.getElementById('signOutBtn').classList.toggle('is-hidden')
+const signOut = async () => {
+  localStorage.removeItem('account')
+  localStorage.removeItem('token')
 }
 
-const loadAccountForm = (document) => {
-  const account = localStorage.getItem('account')
-  const token = localStorage.getItem('token')
-
-  document.getElementById('signOutBtn').addEventListener('click', async () => {
-    localStorage.removeItem('account')
-    localStorage.removeItem('token')
-    toggleAccountButtons(document)
-    await renderChart(document)
-  })
-
-  Array.from(document.getElementsByClassName('delete')).forEach((e) => {
-    e.addEventListener('click', () => {
-      e.parentElement.parentElement.parentElement.classList.remove('is-active')
-    })
-  })
-
+const signIn = async (account, token) => {
   if (account && token) {
-    toggleAccountButtons(document)
+    localStorage.setItem('account', account)
+    localStorage.setItem('token', token)
+    return true
   }
-
-  document
-    .getElementById('showSignInBtn')
-    .addEventListener('click', async () => {
-      document.getElementById('signInModal').classList.toggle('is-active')
-    })
-
-  document.getElementById('signInBtn').addEventListener('click', async () => {
-    const token = document.getElementById('token').value
-    const account = document.getElementById('account').value
-    if (account && token) {
-      localStorage.setItem('account', account)
-      localStorage.setItem('token', token)
-      toggleAccountButtons(document)
-      document.getElementById('signInModal').classList.toggle('is-active')
-      await renderChart(document)
-    }
-  })
+  return false
 }
 
-const loadRegionDropdown = (window, document) => {
-  const element = document.getElementById('region')
+const getSignedIn = () => {
+  return localStorage.getItem('account') && localStorage.getItem('token')
+}
+
+const loadPeriodFrom = (element) => {
+  const periodFrom = new Date()
+  if (periodFrom.getHours() >= 16) {
+    periodFrom.setDate(periodFrom.getDate() + 1)
+  }
+  element.value = periodFrom.toISOString().slice(0, 10)
+  element.max = element.value
+  return element.value
+}
+
+const loadRegion = (element) => {
   element.value = localStorage.getItem('region') || 'A'
-  element.addEventListener('change', async () => {
-    localStorage.setItem('region', element.value)
-    await renderChart(document)
-  })
+  return element.value
 }
 
-const onload = async (window, document) => {
-  const today = new Date()
-  if (today.getHours() >= 16) {
-    today.setDate(today.getDate() + 1)
+const setRegion = async (region) => {
+  if (region) {
+    localStorage.setItem('region', region)
   }
-  loadAccountForm(document)
-  loadRegionDropdown(window, document)
-  const datePicker = document.getElementById('periodFrom')
-  datePicker.value = today.toISOString().slice(0, 10)
-  datePicker.max = today.toISOString().slice(0, 10)
-  datePicker.addEventListener('change', async () => {
-    await renderChart(document)
-  })
-  await renderChart(document)
+}
+
+const onload = (chartElement, regionElement, datePickerElement) => {
+  const periodFrom = loadPeriodFrom(datePickerElement)
+  const region = loadRegion(regionElement)
+  renderChart(chartElement, periodFrom, region)
 }

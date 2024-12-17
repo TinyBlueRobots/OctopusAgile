@@ -4,24 +4,26 @@
 <head>
   <title>Octopus Agile Price & Consumption Tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
-  <script src="octopus.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script src="octopus.js"></script>
   <style>
     html,
-    header,
-    section,
-    footer,
-    input[type="text"],
-    input[type="date"],
-    .select,
-    .box {
+    option,
+    .modal-card-head,
+    .modal-card-body,
+    .modal-card-foot,
+    .button {
       background-color: rgb(16, 0, 48) !important
     }
 
     .button,
     input {
-      background-color: rgb(88, 64, 255) !important;
       color: azure !important;
+    }
+
+    .button:hover {
+      border-color: rgb(250, 152, 255) !important;
     }
 
     #chart {
@@ -38,15 +40,21 @@
   <header>
     <h1 class="title has-text-centered">Octopus Agile Price & Consumption Tracker</h1>
   </header>
-  <main class="box">
-    <input id="showSignInBtn" type="submit" value="Sign In" class="button is-pulled-right" />
-    <input id="signOutBtn" type="submit" value="Sign Out" class="button is-hidden is-pulled-right" />
+  <main class="box has-background-inherit" data-signals-signinmodalactive="false"
+    data-signals-signedintrigger="true"
+    data-computed-signedin="signedintrigger.value && getSignedIn()">
+    <button class="button is-pulled-right" data-class-is-hidden="signedin.value"
+      data-on-click="signinmodalactive.value = true">Sign In</button>
+    <button class="button is-pulled-right" data-class-is-hidden="!signedin.value"
+      data-on-click="signOut(); signedintrigger.value = false; renderChart(chartref.value, periodfrom.value.value, region.value.value)">Sign
+      Out</button>
     <div class="field">
       <label class="label">Region</label>
       <div class="control">
-        <div class="select">
-          <select id="region" class="has-background-inherit">
-            <option value="A" selected>Eastern England</option>
+        <div class="select" class="has-background-inherit">
+          <select class="has-background-inherit" data-ref-region
+            data-on-change="setRegion(region.value.value); renderChart(chartref.value, periodfrom.value.value, region.value.value)">
+            <option value="A">Eastern England</option>
             <option value="B">East Midlands</option>
             <option value="C">London</option>
             <option value="D">North Wales, Merseyside and Cheshire</option>
@@ -66,43 +74,45 @@
     </div>
     <div class="field">
       <label for="periodFrom" class="label">Date</label>
-      <input type="date" id="periodFrom" class="control" />
+      <input id="periodFrom" type="date" data-ref-periodfrom class="button has-background-inherit"
+        data-on-change="renderChart(chartref.value, periodfrom.value.value, region.value.value)" />
     </div>
-    <div id="chart"></div>
+    <div data-ref-chartref></div>
   </main>
-  <footer class="footer">
-    <div class="has-text-centered box">
+  <footer class="footer has-background-inherit">
+    <div class="has-text-centered box has-background-inherit">
       This site is not affiliated with Octopus Energy. It uses the <a href="https://developer.octopus.energy"
         target="_blank">Octopus Energy API</a> to display Agile tariff prices and consumption data.
       <br />
-      Sign in to see your consumption data. Your account and token will only be stored in your browser's local storage.
+      <span data-class-is-hidden="signedintrigger.value">
+        <a href="#" data-on-click="signinmodalactive.value = true">Sign in</a> to see your consumption data. Your
+        account and token will only be stored in your browser's local
+        storage.
+      </span>
     </div>
   </footer>
-  <script>
-    window.onload = function () {
-      onload(window, document)
-    }
-  </script>
-  <div id="signInModal" class="modal">
+  <div class="modal" data-class-is-active="signinmodalactive.value">
     <div class="modal-background"></div>
     <div class="modal-card">
       <header class="modal-card-head">
         <p class="modal-card-title">Sign in</p>
-        <button class="delete" aria-label="close"></button>
+        <button class="delete" aria-label="close" data-on-click="signinmodalactive.value = false"></button>
       </header>
       <section class="modal-card-body">
         <label for="account" class="label">Account</label>
-        <input type="text" id="account" name="account" class="input" />
+        <input type="text" id="account" class="input has-background-inherit" data-bind-account />
         <label for="token" class="label">Token</label>
-        <input type="text" id="token" name="token" class="input" />
+        <input type="text" id="token" class="input has-background-inherit" data-bind-token />
       </section>
       <footer class="modal-card-foot">
         <div class="buttons">
-          <button id="signInBtn" class="button is-success">Ok</button>
+          <button class="button"
+            data-on-click="signedintrigger.value = signIn(account.value, token.value); signinmodalactive.value = false; renderChart(chartref.value, periodfrom.value.value, region.value.value)">Ok</button>
         </div>
       </footer>
     </div>
   </div>
+  <script data-on-load="onload(chartref.value, region.value, periodfrom.value)"></script>
 </body>
 
 </html>
