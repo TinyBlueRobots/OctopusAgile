@@ -40,8 +40,7 @@
   <header>
     <h1 class="title has-text-centered">Octopus Agile Price & Consumption Tracker</h1>
   </header>
-  <main class="box has-background-inherit" data-signals-signinmodalactive="false"
-    data-signals-signedintrigger="true"
+  <main class="box has-background-inherit" data-signals-signinmodalactive="false" data-signals-signedintrigger="true"
     data-computed-signedin="signedintrigger.value && getSignedIn()">
     <button class="button is-pulled-right" data-class-is-hidden="signedin.value"
       data-on-click="signinmodalactive.value = true">Sign In</button>
@@ -81,14 +80,18 @@
   </main>
   <footer class="footer has-background-inherit">
     <div class="has-text-centered box has-background-inherit">
-      This site is not affiliated with Octopus Energy. It uses the <a href="https://developer.octopus.energy"
-        target="_blank">Octopus Energy API</a> to display Agile tariff prices and consumption data.
-      <br />
-      <span data-class-is-hidden="signedintrigger.value">
+      <p>
+        This site is not affiliated with Octopus Energy. It uses the <a href="https://developer.octopus.energy"
+          target="_blank">Octopus Energy API</a> to display Agile tariff prices and consumption data.
+      </p>
+      <p data-class-is-hidden="signedin.value">
         <a href="#" data-on-click="signinmodalactive.value = true">Sign in</a> to see your consumption data. Your
         account and token will only be stored in your browser's local
         storage.
-      </span>
+      </p>
+      <p>
+        Built by <a href="https://tinybluerobots.com" target="_blank">Tiny Blue Robots</a>.
+      </p>
     </div>
   </footer>
   <div class="modal" data-class-is-active="signinmodalactive.value">
