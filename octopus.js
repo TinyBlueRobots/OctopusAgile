@@ -20,6 +20,8 @@ let usageChartInstance
 const apiCache = {}
 const apiRoot = 'https://api.octopus.energy/v1/'
 
+const getAccount = () => localStorage.getItem('account')
+
 const getPeriodTo = (periodFrom) => {
   const periodTo = new Date(periodFrom)
   periodTo.setDate(periodTo.getDate() + 1)

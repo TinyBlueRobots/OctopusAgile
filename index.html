@@ -46,40 +46,51 @@
     <h1 class="title has-text-centered">Octopus Agile Price & Consumption Tracker</h1>
   </header>
   <main class="box has-background-inherit" data-signals-signinmodalactive="false" data-signals-signedintrigger="true"
-    data-computed-signedin="signedintrigger.value && getSignedIn()">
-    <button class="button is-pulled-right" data-class-is-hidden="signedin.value"
-      data-on-click="signinmodalactive.value = true">Sign In</button>
-    <button class="button is-pulled-right" data-class-is-hidden="!signedin.value"
-      data-on-click="signOut(); signedintrigger.value = false; renderRatesChart(chartref.value, periodfrom.value.value, region.value.value)">Sign
-      Out</button>
-    <div class="field">
-      <label class="label">Region</label>
-      <div class="control">
-        <div class="select" class="has-background-inherit">
-          <select class="has-background-inherit" data-ref-region
-            data-on-change="setRegion(region.value.value); renderRatesChart(chartref.value, periodfrom.value.value, region.value.value)">
-            <option value="A">Eastern England</option>
-            <option value="B">East Midlands</option>
-            <option value="C">London</option>
-            <option value="D">North Wales, Merseyside and Cheshire</option>
-            <option value="E">West Midlands</option>
-            <option value="F">North East England</option>
-            <option value="G">North West England</option>
-            <option value="H">Southern England</option>
-            <option value="J">South East England</option>
-            <option value="K">South Wales</option>
-            <option value="L">South West England</option>
-            <option value="M">Yorkshire</option>
-            <option value="N">Southern Scotland</option>
-            <option value="P">Northern Scotland</option>
-          </select>
+    data-computed-signedin="signedintrigger.value && getSignedIn()"
+    data-computed-accountname="signedintrigger.value && getAccount()">
+    <div class="columns">
+      <div class="column is-11">
+        <div class="field">
+          <label class="label">Region</label>
+          <div class="control">
+            <div class="select" class="has-background-inherit">
+              <select class="has-background-inherit" data-ref-region
+                data-on-change="setRegion(region.value.value); renderRatesChart(chartref.value, periodfrom.value.value, region.value.value)">
+                <option value="A">Eastern England</option>
+                <option value="B">East Midlands</option>
+                <option value="C">London</option>
+                <option value="D">North Wales, Merseyside and Cheshire</option>
+                <option value="E">West Midlands</option>
+                <option value="F">North East England</option>
+                <option value="G">North West England</option>
+                <option value="H">Southern England</option>
+                <option value="J">South East England</option>
+                <option value="K">South Wales</option>
+                <option value="L">South West England</option>
+                <option value="M">Yorkshire</option>
+                <option value="N">Southern Scotland</option>
+                <option value="P">Northern Scotland</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="periodFrom" class="label">Date</label>
+          <input id="periodFrom" type="date" data-ref-periodfrom class="button has-background-inherit"
+            data-on-change="renderRatesChart(chartref.value, periodfrom.value.value, region.value.value)" />
         </div>
       </div>
-    </div>
-    <div class="field">
-      <label for="periodFrom" class="label">Date</label>
-      <input id="periodFrom" type="date" data-ref-periodfrom class="button has-background-inherit"
-        data-on-change="renderRatesChart(chartref.value, periodfrom.value.value, region.value.value)" />
+      <div class="column">
+        <div class="field">
+        <label for="accountName" class="label" data-class-is-hidden="!signedin.value">Account</label>
+        <span id="accountName" data-class-is-hidden="!signedin.value" data-text="accountname.value"></span>
+        </div>
+        <button class="button" data-class-is-hidden="signedin.value" data-on-click="signinmodalactive.value = true">Sign
+          In</button>
+        <button class="button" data-class-is-hidden="!signedin.value"
+          data-on-click="signOut(); signedintrigger.value = false; renderRatesChart(chartref.value, periodfrom.value.value, region.value.value)">Sign
+          Out</button>
+      </div>
     </div>
     <div data-ref-chartref></div>
   </main>
