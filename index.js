@@ -24,7 +24,7 @@ let periodFromElement
 const apiCache = {}
 const apiRoot = 'https://api.octopus.energy/v1/'
 
-const getAccount = (v) => localStorage.getItem('account')
+const getAccount = () => localStorage.getItem('account')
 
 const getPeriodTo = (periodFrom) => {
   const periodTo = new Date(periodFrom)
@@ -36,7 +36,7 @@ const getData = async (path, token) => {
   if (apiCache[path]) {
     return apiCache[path]
   }
-  headers = token ? { Authorization: `Basic ${btoa(token)}` } : {}
+  const headers = token ? { Authorization: `Basic ${btoa(token)}` } : {}
   const response = await fetch(path, { headers: headers })
   if (response.ok) {
     apiCache[path] = await response.json()
