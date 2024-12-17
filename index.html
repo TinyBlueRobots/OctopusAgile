@@ -45,43 +45,55 @@
   <header class="section">
     <h1 class="title has-text-centered">Octopus Agile Price & Consumption Tracker</h1>
   </header>
-  <main class="box has-background-inherit" data-signals-signinmodalactive="false" data-signals-signedintrigger="true"
-    data-computed-signedin="signedintrigger.value && getSignedIn()">
-    <button class="button is-pulled-right" data-class-is-hidden="signedin.value"
-      data-on-click="signinmodalactive.value = true">Sign In</button>
-    <button class="button is-pulled-right" data-class-is-hidden="!signedin.value"
-      data-on-click="signOut(); signedintrigger.value = false; renderRatesChart(chartref.value, periodfrom.value.value, region.value.value)">Sign
-      Out</button>
-    <div class="field">
-      <label class="label">Region</label>
-      <div class="control">
-        <div class="select" class="has-background-inherit">
-          <select class="has-background-inherit" data-ref-region
-            data-on-change="setRegion(region.value.value); renderRatesChart(chartref.value, periodfrom.value.value, region.value.value)">
-            <option value="A">Eastern England</option>
-            <option value="B">East Midlands</option>
-            <option value="C">London</option>
-            <option value="D">North Wales, Merseyside and Cheshire</option>
-            <option value="E">West Midlands</option>
-            <option value="F">North East England</option>
-            <option value="G">North West England</option>
-            <option value="H">Southern England</option>
-            <option value="J">South East England</option>
-            <option value="K">South Wales</option>
-            <option value="L">South West England</option>
-            <option value="M">Yorkshire</option>
-            <option value="N">Southern Scotland</option>
-            <option value="P">Northern Scotland</option>
-          </select>
+  <main class="box has-background-inherit" data-signals-signinmodalactive="false" data-signals-signedin="true"
+    data-computed-accountname="signedin.value && getAccount(signedin.value)">
+    <div class="columns">
+      <div class="column is-11">
+        <div class="field">
+          <label class="label">Region</label>
+          <div class="control">
+            <div class="select" class="has-background-inherit">
+              <select class="has-background-inherit" data-ref-region data-on-change="setRegion(); renderCharts()">
+                <option value="A">Eastern England</option>
+                <option value="B">East Midlands</option>
+                <option value="C">London</option>
+                <option value="D">North Wales, Merseyside and Cheshire</option>
+                <option value="E">West Midlands</option>
+                <option value="F">North East England</option>
+                <option value="G">North West England</option>
+                <option value="H">Southern England</option>
+                <option value="J">South East England</option>
+                <option value="K">South Wales</option>
+                <option value="L">South West England</option>
+                <option value="M">Yorkshire</option>
+                <option value="N">Southern Scotland</option>
+                <option value="P">Northern Scotland</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="periodFrom" class="label">Date</label>
+          <input id="periodFrom" type="date" data-ref-periodfrom class="button has-background-inherit"
+            data-on-change="renderCharts()" />
         </div>
       </div>
+      <div class="column">
+        <div class="field" data-class-is-hidden="!accountname.value">
+          <label for="accountName" class="label">Account</label>
+          <span id="accountName" data-text="accountname.value"></span>
+        </div>
+        <button class="button" data-class-is-hidden="accountname.value"
+          data-on-click="signinmodalactive.value = true">Sign
+          In</button>
+        <button class="button" data-class-is-hidden="!accountname.value"
+          data-on-click="signOut(); signedin.value = false; renderCharts()">Sign
+          Out</button>
+      </div>
     </div>
-    <div class="field">
-      <label for="periodFrom" class="label">Date</label>
-      <input id="periodFrom" type="date" data-ref-periodfrom class="button has-background-inherit"
-        data-on-change="renderRatesChart(chartref.value, periodfrom.value.value, region.value.value)" />
-    </div>
-    <div data-ref-chartref></div>
+    <div data-ref-rateschart></div>
+    <br>
+    <div data-ref-costchart></div>
   </main>
   <footer class="footer has-background-inherit">
     <div class="has-text-centered box has-background-inherit">
@@ -93,7 +105,7 @@
         This site is not affiliated with Octopus Energy. It uses the <a href="https://developer.octopus.energy"
           target="_blank">Octopus Energy API</a> to display Agile tariff prices and consumption data.
       </p>
-      <p data-class-is-hidden="signedin.value">
+      <p data-class-is-hidden="accountname.value">
         <a href="#" data-on-click="signinmodalactive.value = true">Sign in</a> to see your consumption data. Your
         account and token will only be stored in your browser's local
         storage.
@@ -119,12 +131,13 @@
       <footer class="modal-card-foot">
         <div class="buttons">
           <button class="button"
-            data-on-click="signedintrigger.value = signIn(account.value, token.value); signinmodalactive.value = false; renderRatesChart(chartref.value, periodfrom.value.value, region.value.value)">Ok</button>
+            data-on-click="signedin.value = signIn(account.value, token.value); signinmodalactive.value = false; renderCharts()">Ok</button>
+          <button class="button" data-on-click="signinmodalactive.value = false">Cancel</button>
         </div>
       </footer>
     </div>
   </div>
-  <script data-on-load="onload(chartref.value, region.value, periodfrom.value)"></script>
+  <script data-on-load="onload(rateschart.value, costchart.value, region.value, periodfrom.value)"></script>
 </body>
 
 </html>
