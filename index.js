@@ -234,7 +234,7 @@ const createCostChartOptions = async (region, periodFrom, consumption) => {
     const costInPounds = costs[costs.length - 1] / 100
     series.push({
       name: `Meter ${serial_number} : £${costInPounds.toFixed(2)}`,
-      data: costs.map((cost) => cost.toFixed(2))
+      data: costs.map((cost) => (cost / 100).toFixed(2))
     })
   }
   times[times.length - 1] = '23:59'
