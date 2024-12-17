@@ -15,7 +15,9 @@ const regionMap = {
   P: 'Northern Scotland'
 }
 
-let chartInstance
+let ratesChartInstance
+let usageChartInstance
+const apiCache = {}
 const apiRoot = 'https://api.octopus.energy/v1/'
 
 const getPeriodTo = (periodFrom) => {
@@ -25,9 +27,15 @@ const getPeriodTo = (periodFrom) => {
 }
 
 const getData = async (path, token) => {
+  if (apiCache[path]) {
+    return apiCache[path]
+  }
   headers = token ? { Authorization: `Basic ${btoa(token)}` } : {}
   const response = await fetch(path, { headers: headers })
-  return response.ok ? await response.json() : null
+  if (response.ok) {
+    apiCache[path] = await response.json()
+    return apiCache[path]
+  }
 }
 
 const getConsumption = async (account, token, periodFrom) => {
@@ -98,7 +106,7 @@ const getConsumptionCosts = async (rates, consumption) => {
   return consumption
 }
 
-const createChartOptions = async (region, periodFrom, consumption) => {
+const createRatesChartOptions = async (region, periodFrom, consumption) => {
   const rates = await getRates(region, periodFrom).then((rates) =>
     rates.reverse()
   )
@@ -122,7 +130,6 @@ const createChartOptions = async (region, periodFrom, consumption) => {
   }
   const times = rates.map((rate) => rate.valid_from.slice(11, 16))
   let annotations = { xaxis: [] }
-  console.log(periodFrom.toDateString(), new Date().toDateString())
   if (periodFrom.toDateString() === new Date().toDateString()) {
     const nextRateTime = rates.find(
       (rate) => new Date(rate.valid_from) > new Date()
@@ -202,7 +209,7 @@ const createChartOptions = async (region, periodFrom, consumption) => {
   return options
 }
 
-const renderChart = async (chartElement, periodFromStr, region) => {
+const renderRatesChart = async (chartElement, periodFromStr, region) => {
   const periodFrom = new Date(periodFromStr)
   document.body.style.cursor = 'wait'
   let consumption
@@ -213,12 +220,16 @@ const renderChart = async (chartElement, periodFromStr, region) => {
       periodFrom
     )
   }
-  const chartOptions = await createChartOptions(region, periodFrom, consumption)
-  if (!chartInstance) {
-    chartInstance = new ApexCharts(chartElement, chartOptions)
-    await chartInstance.render()
+  const chartOptions = await createRatesChartOptions(
+    region,
+    periodFrom,
+    consumption
+  )
+  if (!ratesChartInstance) {
+    ratesChartInstance = new ApexCharts(chartElement, chartOptions)
+    await ratesChartInstance.render()
   } else {
-    chartInstance.updateOptions(chartOptions)
+    ratesChartInstance.updateOptions(chartOptions)
   }
   document.body.style.cursor = 'default'
 }
@@ -265,5 +276,5 @@ const setRegion = async (region) => {
 const onload = (chartElement, regionElement, datePickerElement) => {
   const periodFrom = loadPeriodFrom(datePickerElement)
   const region = loadRegion(regionElement)
-  renderChart(chartElement, periodFrom, region)
+  renderRatesChart(chartElement, periodFrom, region)
 }

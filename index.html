@@ -3,8 +3,10 @@
 
 <head>
   <title>Octopus Agile Price & Consumption Tracker</title>
-  <meta name="description" content="Track Octopus Agile prices and your energy consumption with our easy-to-use tracker.">
-  <meta name="keywords" content="Octopus Energy, Agile Prices, Energy Consumption, Energy Tracker, Octopus Agile, Energy Prices, Consumption Tracker">
+  <meta name="description"
+    content="Track Octopus Agile prices and your energy consumption with our easy-to-use tracker.">
+  <meta name="keywords"
+    content="Octopus Energy, Agile Prices, Energy Consumption, Energy Tracker, Octopus Agile, Energy Prices, Consumption Tracker">
   <meta name="author" content="Tiny Blue Robots">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
   <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script>
@@ -48,14 +50,14 @@
     <button class="button is-pulled-right" data-class-is-hidden="signedin.value"
       data-on-click="signinmodalactive.value = true">Sign In</button>
     <button class="button is-pulled-right" data-class-is-hidden="!signedin.value"
-      data-on-click="signOut(); signedintrigger.value = false; renderChart(chartref.value, periodfrom.value.value, region.value.value)">Sign
+      data-on-click="signOut(); signedintrigger.value = false; renderRatesChart(chartref.value, periodfrom.value.value, region.value.value)">Sign
       Out</button>
     <div class="field">
       <label class="label">Region</label>
       <div class="control">
         <div class="select" class="has-background-inherit">
           <select class="has-background-inherit" data-ref-region
-            data-on-change="setRegion(region.value.value); renderChart(chartref.value, periodfrom.value.value, region.value.value)">
+            data-on-change="setRegion(region.value.value); renderRatesChart(chartref.value, periodfrom.value.value, region.value.value)">
             <option value="A">Eastern England</option>
             <option value="B">East Midlands</option>
             <option value="C">London</option>
@@ -77,14 +79,15 @@
     <div class="field">
       <label for="periodFrom" class="label">Date</label>
       <input id="periodFrom" type="date" data-ref-periodfrom class="button has-background-inherit"
-        data-on-change="renderChart(chartref.value, periodfrom.value.value, region.value.value)" />
+        data-on-change="renderRatesChart(chartref.value, periodfrom.value.value, region.value.value)" />
     </div>
     <div data-ref-chartref></div>
   </main>
   <footer class="footer has-background-inherit">
     <div class="has-text-centered box has-background-inherit">
       <p>
-        Not on Agile? <a href="https://share.octopus.energy/rich-moon-324" target="_blank">Switch to Octopus Energy</a> and get £50 credit.
+        Not on Agile? <a href="https://share.octopus.energy/rich-moon-324" target="_blank">Switch to Octopus Energy</a>
+        and get £50 credit.
       </p>
       <p>
         This site is not affiliated with Octopus Energy. It uses the <a href="https://developer.octopus.energy"
@@ -116,7 +119,7 @@
       <footer class="modal-card-foot">
         <div class="buttons">
           <button class="button"
-            data-on-click="signedintrigger.value = signIn(account.value, token.value); signinmodalactive.value = false; renderChart(chartref.value, periodfrom.value.value, region.value.value)">Ok</button>
+            data-on-click="signedintrigger.value = signIn(account.value, token.value); signinmodalactive.value = false; renderRatesChart(chartref.value, periodfrom.value.value, region.value.value)">Ok</button>
         </div>
       </footer>
     </div>
