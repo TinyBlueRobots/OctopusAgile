@@ -43,7 +43,7 @@
   <header class="section">
     <h1 class="title has-text-centered">Octopus Agile Price & Consumption Tracker</h1>
   </header>
-  <main class="box has-background-inherit" data-signals-signinmodalactive="false" data-signals-accountname="false">
+  <main class="box has-background-inherit">
     <div class="columns">
       <div class="column is-11">
         <div class="field">
@@ -77,10 +77,10 @@
       <div class="column">
         <div class="field" data-class-is-hidden="!accountname.value">
           <label for="accountName" class="label">Account</label>
-          <span id="accountName" data-text="accountname.value"></span>
+          <span id="accountName" data-bind-accountname data-text="accountname.value"></span>
         </div>
         <button class="button" data-class-is-hidden="accountname.value" data-on-click="signinmodalactive.value = true">Sign In</button>
-        <button class="button" data-class-is-hidden="!accountname.value" data-on-click="signOut(); accountname.value = false; renderCharts()">Sign Out</button>
+        <button class="button" data-class-is-hidden="!accountname.value" data-on-click="signOut(); accountname.value = false">Sign Out</button>
       </div>
     </div>
     <div data-ref-rateschart></div>
@@ -103,7 +103,7 @@
       </p>
     </div>
   </footer>
-  <div class="modal" data-class-is-active="signinmodalactive.value">
+  <div class="modal" data-bind-signinmodalactive data-class-is-active="signinmodalactive.value">
     <div class="modal-background"></div>
     <div class="modal-card">
       <header class="modal-card-head">
@@ -118,13 +118,13 @@
       </section>
       <footer class="modal-card-foot">
         <div class="buttons">
-          <button class="button" data-on-click="signIn(account.value, token.value).then(value => accountname.value = value).then(() => signinmodalactive.value = !accountname.value).then(() => renderCharts())">Ok</button>
+          <button class="button" data-on-click="signIn(account.value, token.value).then(value => accountname.value = value).then(() => signinmodalactive.value = !accountname.value)">Ok</button>
           <button class="button" data-on-click="signinmodalactive.value = false">Cancel</button>
         </div>
       </footer>
     </div>
   </div>
-  <script data-on-load="onload(rateschart.value, costchart.value, region.value, periodfrom.value)"></script>
+  <script data-on-load="onload(rateschart.value, costchart.value, region.value, periodfrom.value); accountname.value = getAccount()"></script>
 </body>
 
 </html>
