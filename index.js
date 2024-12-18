@@ -23,6 +23,9 @@ const getData = async (path, token) => {
   }
   const response = await fetch(path, { headers: headers })
   if (response.ok) {
+    if (Object.keys(apiCache).length >= 10) {
+      delete apiCache[Object.keys(apiCache)[0]]
+    }
     apiCache[cacheKey] = await response.json()
     return apiCache[cacheKey]
   }
@@ -330,6 +333,22 @@ const loadPeriodFrom = () => {
   }
   periodFromElement.value = periodFrom.toISOString().slice(0, 10)
   periodFromElement.max = periodFromElement.value
+}
+
+const setNextDay = () => {
+  if (periodFromElement.value < periodFromElement.max) {
+    const periodFrom = new Date(periodFromElement.value)
+    periodFrom.setDate(periodFrom.getDate() + 1)
+    periodFromElement.value = periodFrom.toISOString().slice(0, 10)
+    renderCharts()
+  }
+}
+
+const setPreviousDay = () => {
+  const periodFrom = new Date(periodFromElement.value)
+  periodFrom.setDate(periodFrom.getDate() - 1)
+  periodFromElement.value = periodFrom.toISOString().slice(0, 10)
+  renderCharts()
 }
 
 const loadRegion = () => {

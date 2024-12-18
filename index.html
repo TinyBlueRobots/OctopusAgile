@@ -71,7 +71,9 @@
         </div>
         <div class="field">
           <label for="periodFrom" class="label">Date</label>
-          <input id="periodFrom" type="date" data-ref-periodfrom class="button has-background-inherit" data-on-change="renderCharts()" />
+          <span data-on-click="setPreviousDay()" class="button has-background-inherit"><<</span>
+          <input type="date" data-ref-periodfrom class="button has-background-inherit" data-on-change="renderCharts()" />
+          <span data-on-click="setNextDay()" class="button has-background-inherit">>></span>
         </div>
       </div>
       <div class="column">
