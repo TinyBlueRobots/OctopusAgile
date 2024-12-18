@@ -1,20 +1,3 @@
-const regionMap = {
-  A: 'Eastern England',
-  B: 'East Midlands',
-  C: 'London',
-  D: 'North Wales, Merseyside and Cheshire',
-  E: 'West Midlands',
-  F: 'North East England',
-  G: 'North West England',
-  H: 'Southern England',
-  J: 'South East England',
-  K: 'South Wales',
-  L: 'South West England',
-  M: 'Yorkshire',
-  N: 'Southern Scotland',
-  P: 'Northern Scotland'
-}
-
 let ratesChartInstance
 let costChartInstance
 let ratesChartElement
@@ -33,14 +16,15 @@ const getPeriodTo = (periodFrom) => {
 }
 
 const getData = async (path, token) => {
-  if (apiCache[path]) {
-    return apiCache[path]
-  }
   const headers = token ? { Authorization: `Basic ${btoa(token)}` } : {}
+  const cacheKey = `${path} ${JSON.stringify(headers)}`
+  if (apiCache[cacheKey]) {
+    return apiCache[cacheKey]
+  }
   const response = await fetch(path, { headers: headers })
   if (response.ok) {
-    apiCache[path] = await response.json()
-    return apiCache[path]
+    apiCache[cacheKey] = await response.json()
+    return apiCache[cacheKey]
   }
 }
 
@@ -324,6 +308,7 @@ const signOut = async () => {
   costChartInstance && costChartInstance.destroy()
   ratesChartInstance = null
   costChartInstance = null
+  renderCharts()
 }
 
 const signIn = async (account, token) => {
@@ -332,6 +317,7 @@ const signIn = async (account, token) => {
     if (accountData) {
       localStorage.setItem('account', account)
       localStorage.setItem('token', token)
+      renderCharts()
       return account
     }
   }
@@ -359,7 +345,15 @@ const setRegion = () => {
 
 const renderCharts = async () => await Promise.all([renderRatesChart(), renderCostChart()])
 
-const onload = (ratesChartElementValue, costChartElementValue, regionElementValue, periodFromElementValue) => {
+const nextRateChange = () => {
+  const now = new Date()
+  const nextInterval = new Date()
+  nextInterval.setSeconds(0)
+  nextInterval.setMinutes(now.getMinutes() < 30 ? 30 : 60)
+  return nextInterval - now
+}
+
+const onload = async (ratesChartElementValue, costChartElementValue, regionElementValue, periodFromElementValue) => {
   ratesChartElement = ratesChartElementValue
   costChartElement = costChartElementValue
   periodFromElement = periodFromElementValue
@@ -367,17 +361,10 @@ const onload = (ratesChartElementValue, costChartElementValue, regionElementValu
   loadRegion()
   loadPeriodFrom()
   renderCharts()
-  const nextRateChange = (() => {
-    const now = new Date()
-    const nextInterval = new Date()
-    nextInterval.setSeconds(0)
-    nextInterval.setMinutes(now.getMinutes() < 30 ? 30 : 60)
-    return nextInterval - now
-  })()
   setTimeout(() => {
     renderCharts()
     setInterval(() => {
       renderCharts()
     }, 1800000)
-  }, nextRateChange)
+  }, nextRateChange())
 }
