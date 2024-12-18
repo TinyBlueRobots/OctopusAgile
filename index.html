@@ -47,10 +47,10 @@
     <div class="columns">
       <div class="column is-11">
         <div class="field">
-          <label class="label">Region</label>
+          <label for="region" class="label">Region</label>
           <div class="control">
             <div class="select" class="has-background-inherit">
-              <select class="has-background-inherit" data-ref-region data-on-change="setRegion(); renderCharts()">
+              <select id="region" class="has-background-inherit" data-ref-region data-on-change="setRegion(); renderCharts()">
                 <option value="A">Eastern England</option>
                 <option value="B">East Midlands</option>
                 <option value="C">London</option>
@@ -70,16 +70,16 @@
           </div>
         </div>
         <div class="field">
-          <label for="periodFrom" class="label">Date</label>
+          <label for="periodfrom" class="label">Date</label>
           <span data-on-click="setPreviousDay()" class="button has-background-inherit"><<</span>
-          <input type="date" data-ref-periodfrom class="button has-background-inherit" data-on-change="renderCharts()" />
+          <input id="periodfrom" type="date" data-ref-periodfrom class="button has-background-inherit" data-on-change="renderCharts()" />
           <span data-on-click="setNextDay()" class="button has-background-inherit">>></span>
         </div>
       </div>
       <div class="column">
         <div class="field" data-class-is-hidden="!accountname.value">
-          <label for="accountName" class="label">Account</label>
-          <span id="accountName" data-bind-accountname data-text="accountname.value"></span>
+          <label class="label">Account</label>
+          <span data-bind-accountname data-text="accountname.value"></span>
         </div>
         <button class="button" data-class-is-hidden="accountname.value" data-on-click="signinmodalactive.value = true">Sign In</button>
         <button class="button" data-class-is-hidden="!accountname.value" data-on-click="signOut(); accountname.value = false">Sign Out</button>
@@ -114,9 +114,9 @@
       </header>
       <section class="modal-card-body">
         <label for="account" class="label">Account</label>
-        <input type="text" id="account" class="input has-background-inherit" data-bind-account />
+        <input id="account" type="text" class="input has-background-inherit" data-bind-account />
         <label for="token" class="label">Token</label>
-        <input type="text" id="token" class="input has-background-inherit" data-bind-token />
+        <input id="token" type="text" class="input has-background-inherit" data-bind-token />
       </section>
       <footer class="modal-card-foot">
         <div class="buttons">
