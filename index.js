@@ -393,21 +393,21 @@ const signIn = async (account, token) => {
   return false
 }
 
-const setInitialPeriodFrom = (periodFromElement) => {
+const getMaxPeriodFrom = () => {
   const periodFrom = new Date()
   if (periodFrom.getHours() >= 16) {
     periodFrom.setDate(periodFrom.getDate() + 1)
   }
-  periodFromElement.value = periodFromElement.max = periodFrom.toISOString().slice(0, 10)
+  return periodFrom.toISOString().slice(0, 10)
 }
 
-const setNextDay = (periodFromElement) => {
-  const periodFrom = new Date(periodFromElement.value)
-  if (periodFrom < new Date(periodFromElement.max)) {
+const setNextDay = (periodFromValue, maxPeriodFromValue) => {
+  const periodFrom = new Date(periodFromValue)
+  if (periodFrom < new Date(maxPeriodFromValue)) {
     periodFrom.setDate(periodFrom.getDate() + 1)
     return periodFrom.toISOString().slice(0, 10)
   }
-  return periodFromElement.value
+  return periodFromValue
 }
 
 const setPreviousDay = (periodFromValue) => {
@@ -428,14 +428,14 @@ const nextRateChange = () => {
   return nextInterval - now
 }
 
-const onload = async (ratesChartElementValue, costChartElementValue, periodFromElement, region) => {
+const onload = async (ratesChartElementValue, costChartElementValue, region, periodFrom) => {
   ratesChartElement = ratesChartElementValue
   costChartElement = costChartElementValue
-  renderCharts(region, periodFromElement.value)
+  renderCharts(region, periodFrom)
   setTimeout(() => {
-    renderCharts(region, periodFromElement.value)
+    renderCharts(region, periodFrom)
     setInterval(() => {
-      renderCharts(region, periodFromElement.value)
+      renderCharts(region, periodFrom)
     }, 1800000)
   }, nextRateChange())
 }

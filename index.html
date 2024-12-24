@@ -43,14 +43,14 @@
   <header class="section">
     <h1 class="title has-text-centered">Octopus Agile Price & Consumption Tracker</h1>
   </header>
-  <main class="box has-background-inherit" data-signals-account="''" data-signals-token="''" data-signals-region="getRegion() || 'A'" data-persist="account token region" data-on-load="setInitialPeriodFrom(periodfrom.value); onload(rateschart.value, costchart.value, periodfrom.value, region.value)">
+  <main class="box has-background-inherit" data-signals-maxperiodfrom="periodfrom && getMaxPeriodFrom()" data-signals-periodfrom="maxperiodfrom.value" data-signals-account="''" data-signals-token="''" data-signals-region="getRegion() || 'A'" data-persist="account token region" data-on-load="onload(rateschart.value, costchart.value, region.value, periodfrom.value)">
     <div class="columns">
       <div class="column is-11">
         <div class="field">
           <label for="region" class="label">Region</label>
           <div class="control">
             <div class="select" class="has-background-inherit">
-              <select id="region" class="has-background-inherit" data-bind="region" data-on-change="renderCharts(region.value, periodfrom.value.value)">
+              <select id="region" class="has-background-inherit" data-bind="region" data-on-change="renderCharts(region.value, periodfrom.value)">
                 <option value="A">Eastern England</option>
                 <option value="B">East Midlands</option>
                 <option value="C">London</option>
@@ -71,9 +71,9 @@
         </div>
         <div class="field">
           <label for="periodfrom" class="label">Date</label>
-          <span data-on-click="periodfrom.value.value = setPreviousDay(periodfrom.value.value); renderCharts(region.value, periodfrom.value.value)" class="button has-background-inherit">&lt;&lt;</span>
-          <input id="periodfrom" type="date" data-ref-periodfrom class="button has-background-inherit" data-on-change="renderCharts(region.value, periodfrom.value.value)" />
-          <span data-on-click="periodfrom.value.value = setNextDay(periodfrom.value); renderCharts(region.value, periodfrom.value.value)" class="button has-background-inherit">&gt;&gt;</span>
+          <span data-on-click="periodfrom.value = setPreviousDay(periodfrom.value); renderCharts(region.value, periodfrom.value)" class="button has-background-inherit">&lt;&lt;</span>
+          <input id="periodfrom" type="date" data-bind-periodfrom data-attributes-max="maxperiodfrom.value" class="button has-background-inherit" data-on-change="renderCharts(region.value, periodfrom.value)" />
+          <span data-on-click="periodfrom.value = setNextDay(periodfrom.value, maxperiodfrom.value); renderCharts(region.value, periodfrom.value)" class="button has-background-inherit">&gt;&gt;</span>
         </div>
       </div>
       <div class="column">
@@ -82,7 +82,7 @@
           <span data-text="account.value"></span>
         </div>
         <button class="button" data-class-is-hidden="account.value" data-on-click="signinmodalactive.value = true">Sign In</button>
-        <button class="button" data-class-is-hidden="!account.value" data-on-click="account.value = token.value = ''; signOut(); renderCharts(region.value, periodfrom.value.value)">Sign Out</button>
+        <button class="button" data-class-is-hidden="!account.value" data-on-click="account.value = token.value = ''; signOut(); renderCharts(region.value, periodfrom.value)">Sign Out</button>
       </div>
     </div>
     <div data-ref-rateschart></div>
@@ -120,7 +120,7 @@
       </section>
       <footer class="modal-card-foot">
         <div class="buttons">
-          <button class="button" data-on-click="signIn(signinaccount.value, signintoken.value).then(result => result && (account.value = signinaccount.value) && (token.value = signintoken.value) && (signinmodalactive.value = !result)).then(() => renderCharts(region.value, periodfrom.value.value))">Ok</button>
+          <button class="button" data-on-click="signIn(signinaccount.value, signintoken.value).then(result => result && (account.value = signinaccount.value) && (token.value = signintoken.value) && (signinmodalactive.value = !result)).then(() => renderCharts(region.value, periodfrom.value))">Ok</button>
           <button class="button" data-on-click="signinmodalactive.value = false">Cancel</button>
         </div>
       </footer>
