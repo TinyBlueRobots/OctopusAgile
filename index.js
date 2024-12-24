@@ -2,12 +2,31 @@ let ratesChartInstance
 let costChartInstance
 let ratesChartElement
 let costChartElement
-let regionElement
-let periodFromElement
 const apiCache = {}
 const apiRoot = 'https://api.octopus.energy/v1/'
 
-const getAccount = () => localStorage.getItem('account')
+const times = (() => {
+  const times = []
+  for (let i = 0; i <= 48; i++) {
+    hour = Math.floor(i / 2)
+    hour = hour === 24 ? 0 : hour
+    const minute = i % 2 ? '30' : '00'
+    times.push(`${hour.toString().padStart(2, '0')}:${minute}`)
+  }
+  return times
+})()
+
+const getStorageValue = (key) => {
+  let value = localStorage.getItem('datastar')
+  if (!value) return
+  return JSON.parse(value)[key]
+}
+
+const getRegion = () => getStorageValue('region')
+
+const getAccount = () => getStorageValue('account')
+
+const getToken = () => getStorageValue('token')
 
 const getPeriodTo = (periodFrom) => {
   const periodTo = new Date(periodFrom)
@@ -16,7 +35,10 @@ const getPeriodTo = (periodFrom) => {
 }
 
 const getData = async (path, token) => {
-  const headers = token ? { Authorization: `Basic ${btoa(token)}` } : {}
+  const headers = { 'Content-Type': 'application/json' }
+  if (token) {
+    headers.Authorization = `Basic ${btoa(token)}`
+  }
   const cacheKey = `${path} ${JSON.stringify(headers)}`
   if (apiCache[cacheKey]) {
     return apiCache[cacheKey]
@@ -41,23 +63,24 @@ const getConsumption = async (account, token, periodFrom) => {
     .flatMap((property) => property.electricity_meter_points)
     .filter((point) => !point.is_export)
   const meterConsumption = {}
-  for (const meterPoint of meterPoints) {
-    for (const meter of meterPoint.meters) {
-      const consumptionData = await getData(
-        `${apiRoot}electricity-meter-points/${meterPoint.mpan}/meters/${
-          meter.serial_number
-        }/consumption?period_from=${periodFrom.toISOString()}&period_to=${periodTo.toISOString()}`,
+  const meters = meterPoints.flatMap((point) =>
+    point.meters.map((meter) => ({ mpan: point.mpan, serialNumber: meter.serial_number }))
+  )
+  await Promise.all(
+    meters.map(async ({ mpan, serialNumber }) => {
+      const meterData = await getData(
+        `${apiRoot}electricity-meter-points/${mpan}/meters/${serialNumber}/consumption?period_from=${periodFrom.toISOString()}&period_to=${periodTo.toISOString()}`,
         token
       )
-      if (consumptionData && consumptionData.results.length) {
-        meterConsumption[meter.serial_number] = {}
-        for (const { consumption, interval_start } of consumptionData.results) {
-          meterConsumption[meter.serial_number][interval_start] = consumption
+      if (meterData && meterData.results.length) {
+        meterConsumption[serialNumber] = {}
+        for (const { consumption, interval_end } of meterData.results) {
+          meterConsumption[serialNumber][interval_end] = consumption
         }
       }
-    }
-  }
-  return meterConsumption
+    })
+  )
+  return Object.keys(meterConsumption).length ? meterConsumption : null
 }
 
 const getRates = async (region, periodFrom) => {
@@ -80,41 +103,45 @@ const getRates = async (region, periodFrom) => {
 
 const getConsumptionCosts = async (rates, consumption) => {
   const ratesMap = {}
+  const consumptionCosts = {}
   for (const rate of rates) {
     ratesMap[rate.valid_from] = rate.value_inc_vat
   }
   for (const serial_number in consumption) {
+    consumptionCosts[serial_number] = {}
     for (const [period, kwh] of Object.entries(consumption[serial_number])) {
-      const ratesForPeriod = ratesMap[period]
-      if (ratesForPeriod) {
-        consumption[serial_number][period] = kwh * ratesForPeriod
-      }
+      const ratesForPeriod = ratesMap[period] || 0
+      consumptionCosts[serial_number][period] = kwh * ratesForPeriod
     }
   }
-  return consumption
+  return Object.keys(consumptionCosts).length ? consumptionCosts : null
 }
 
 const createRatesChartOptions = async (region, periodFrom, consumption) => {
   const rates = await getRates(region, periodFrom).then((rates) => rates.reverse())
   const prices = rates.map((rate) => rate.value_inc_vat.toFixed(2))
   const series = [{ name: 'Price', data: prices }]
-  consumption = consumption ? await getConsumptionCosts(rates, consumption) : {}
-  for (const serial_number in consumption) {
-    const consumptionCosts = Object.values(consumption[serial_number]).slice(0, prices.length).reverse()
-    if (consumptionCosts.length) {
+  const consumptionCosts = (await getConsumptionCosts(rates, consumption)) || {}
+  for (const serial_number in consumptionCosts) {
+    const meterConsumptionCosts = []
+    for (const consumptionCost of Object.values(consumptionCosts[serial_number])) {
+      meterConsumptionCosts.push(consumptionCost.toFixed(2))
+    }
+    meterConsumptionCosts.push(0)
+    meterConsumptionCosts.reverse()
+    if (meterConsumptionCosts) {
       series.push({
         name: `Meter ${serial_number}`,
-        data: consumptionCosts.map((cost) => cost.toFixed(2))
+        data: meterConsumptionCosts
       })
     }
   }
-  if (!Object.keys(consumption).length) {
+  if (!Object.keys(consumptionCosts).length) {
     series.push({
       name: 'Meter data not available',
       data: Array(prices.length).fill(0)
     })
   }
-  const times = rates.map((rate) => rate.valid_from.slice(11, 16))
   const annotations = { xaxis: [] }
   if (periodFrom.toDateString() === new Date().toDateString()) {
     const nextRateTime = rates.find((rate) => new Date(rate.valid_from) > new Date())
@@ -141,7 +168,7 @@ const createRatesChartOptions = async (region, periodFrom, consumption) => {
       height: 300,
       type: 'line',
       zoom: {
-        enabled: true
+        enabled: false
       }
     },
     legend: {
@@ -162,7 +189,7 @@ const createRatesChartOptions = async (region, periodFrom, consumption) => {
       width: 2
     },
     title: {
-      text: Object.keys(consumption).length ? 'Price and Cost' : 'Price',
+      text: Object.keys(consumptionCosts).length ? 'Price & Cost per ½ hour' : 'Price per ½ hour',
       align: 'center',
       style: {
         color: 'azure'
@@ -177,6 +204,12 @@ const createRatesChartOptions = async (region, periodFrom, consumption) => {
       }
     },
     yaxis: {
+      title: {
+        text: 'Price',
+        style: {
+          color: 'azure'
+        }
+      },
       labels: {
         style: {
           colors: 'azure'
@@ -189,14 +222,14 @@ const createRatesChartOptions = async (region, periodFrom, consumption) => {
   return options
 }
 
-const renderRatesChart = async () => {
-  const periodFrom = new Date(periodFromElement.value)
+const renderRatesChart = async (region, periodFrom) => {
   document.body.style.cursor = 'wait'
   let consumption
-  if (localStorage.getItem('account')) {
-    consumption = await getConsumption(localStorage.getItem('account'), localStorage.getItem('token'), periodFrom)
+  const account = getAccount()
+  if (account) {
+    consumption = await getConsumption(account, getToken(), periodFrom)
   }
-  const chartOptions = await createRatesChartOptions(regionElement.value, periodFrom, consumption)
+  const chartOptions = await createRatesChartOptions(region, periodFrom, consumption)
   if (!ratesChartInstance) {
     ratesChartInstance = new ApexCharts(ratesChartElement, chartOptions)
     await ratesChartInstance.render()
@@ -208,13 +241,12 @@ const renderRatesChart = async () => {
 
 const createCostChartOptions = async (region, periodFrom, consumption) => {
   const rates = await getRates(region, periodFrom).then((rates) => rates.reverse())
-  consumption = await getConsumptionCosts(rates, consumption)
+  const consumptionCosts = (await getConsumptionCosts(rates, consumption)) || {}
   const series = []
-  const times = []
   const costs = []
-  for (const serial_number in consumption) {
-    for (const [time, cost] of Object.entries(consumption[serial_number]).reverse()) {
-      times.push(time.slice(11, 16))
+  const kwhs = []
+  for (const serial_number in consumptionCosts) {
+    for (const cost of Object.values(consumptionCosts[serial_number]).reverse().slice(0, 48)) {
       const currentCost = costs[costs.length - 1] || 0
       costs.push(cost + currentCost)
     }
@@ -223,16 +255,26 @@ const createCostChartOptions = async (region, periodFrom, consumption) => {
       name: `Meter ${serial_number} : £${costInPounds.toFixed(2)}`,
       data: costs.map((cost) => (cost / 100).toFixed(2))
     })
+    for (const serial_number in consumption) {
+      for (const kwh of Object.values(consumption[serial_number]).reverse().slice(0, 48)) {
+        const currentKwh = kwhs[kwhs.length - 1] || 0
+        kwhs.push(kwh + currentKwh)
+      }
+      series.push({
+        name: `Meter ${serial_number} : ${kwhs[kwhs.length - 1].toFixed(2)} kWh`,
+        data: kwhs.map((kwh) => kwh.toFixed(2))
+      })
+    }
   }
-  times[times.length - 1] = '23:59'
+  const costTimes = times.slice(1)
   const options = {
     colors: ['rgb(250, 152, 255)', 'rgb(16, 195, 149)'],
     series,
     chart: {
       height: 300,
-      type: 'line',
+      type: 'bar',
       zoom: {
-        enabled: true
+        enabled: false
       }
     },
     legend: {
@@ -253,47 +295,77 @@ const createCostChartOptions = async (region, periodFrom, consumption) => {
       width: 2
     },
     title: {
-      text: 'Total Cost',
+      text: 'Total Cost & KwH',
       align: 'center',
       style: {
         color: 'azure'
       }
     },
     xaxis: {
-      categories: times,
+      categories: costTimes,
       labels: {
         style: {
           colors: 'azure'
         }
       }
     },
-    yaxis: {
-      labels: {
-        style: {
-          colors: 'azure'
+    yaxis: [
+      {
+        title: {
+          text: 'Cost',
+          style: {
+            color: 'azure'
+          }
+        },
+        axisBorder: {
+          show: true,
+          color: 'rgb(250, 152, 255)'
+        },
+        labels: {
+          style: {
+            colors: 'azure'
+          }
+        }
+      },
+      {
+        opposite: true,
+        title: {
+          text: 'KwH',
+          style: {
+            color: 'azure'
+          }
+        },
+        axisBorder: {
+          show: true,
+          color: 'rgb(16, 195, 149)'
+        },
+        labels: {
+          style: {
+            colors: 'azure'
+          }
         }
       }
-    }
+    ]
   }
 
   return options
 }
 
-const renderCostChart = async () => {
-  const periodFrom = new Date(periodFromElement.value)
+const renderCostChart = async (region, periodFrom) => {
   document.body.style.cursor = 'wait'
-  let consumption = {}
-  if (localStorage.getItem('account')) {
-    consumption = await getConsumption(localStorage.getItem('account'), localStorage.getItem('token'), periodFrom)
+  let consumption
+  const account = getAccount()
+  if (account) {
+    consumption = await getConsumption(account, getToken(), periodFrom)
   }
-  if (!Object.keys(consumption).length) {
+  if (!consumption) {
     costChartInstance && costChartInstance.destroy()
     costChartInstance = null
     document.body.style.cursor = 'default'
     return
   }
   const chartOptions = Object.keys(consumption).length
-    ? await createCostChartOptions(regionElement.value, periodFrom, consumption)
+    ? await createCostChartOptions(region, periodFrom, consumption)
     : {}
   if (!costChartInstance) {
     costChartInstance = new ApexCharts(costChartElement, chartOptions)
@@ -304,65 +376,49 @@ const renderCostChart = async () => {
   document.body.style.cursor = 'default'
 }
 
-const signOut = async () => {
-  localStorage.removeItem('account')
-  localStorage.removeItem('token')
+const signOut = () => {
   ratesChartInstance && ratesChartInstance.destroy()
   costChartInstance && costChartInstance.destroy()
   ratesChartInstance = null
   costChartInstance = null
-  renderCharts()
 }
 
 const signIn = async (account, token) => {
   if (account && token) {
+    document.body.style.cursor = 'wait'
     const accountData = await getAccountData(account, token)
-    if (accountData) {
-      localStorage.setItem('account', account)
-      localStorage.setItem('token', token)
-      renderCharts()
-      return account
-    }
+    document.body.style.cursor = 'default'
+    return accountData ? true : false
   }
+  return false
 }
 
-const loadPeriodFrom = () => {
+const setInitialPeriodFrom = (periodFromElement) => {
   const periodFrom = new Date()
   if (periodFrom.getHours() >= 16) {
     periodFrom.setDate(periodFrom.getDate() + 1)
   }
-  periodFromElement.value = periodFrom.toISOString().slice(0, 10)
-  periodFromElement.max = periodFromElement.value
+  periodFromElement.value = periodFromElement.max = periodFrom.toISOString().slice(0, 10)
 }
 
-const setNextDay = () => {
-  if (periodFromElement.value < periodFromElement.max) {
-    const periodFrom = new Date(periodFromElement.value)
-    periodFrom.setDate(periodFrom.getDate() + 1)
-    periodFromElement.value = periodFrom.toISOString().slice(0, 10)
-    renderCharts()
-  }
-}
-
-const setPreviousDay = () => {
+const setNextDay = (periodFromElement) => {
   const periodFrom = new Date(periodFromElement.value)
-  periodFrom.setDate(periodFrom.getDate() - 1)
-  periodFromElement.value = periodFrom.toISOString().slice(0, 10)
-  renderCharts()
-}
-
-const loadRegion = () => {
-  regionElement.value = localStorage.getItem('region') || 'A'
-  setRegion()
-}
-
-const setRegion = () => {
-  if (regionElement.value) {
-    localStorage.setItem('region', regionElement.value)
+  if (periodFrom < new Date(periodFromElement.max)) {
+    periodFrom.setDate(periodFrom.getDate() + 1)
+    return periodFrom.toISOString().slice(0, 10)
   }
+  return periodFromElement.value
 }
 
-const renderCharts = async () => await Promise.all([renderRatesChart(), renderCostChart()])
+const setPreviousDay = (periodFromValue) => {
+  const periodFrom = new Date(periodFromValue)
+  periodFrom.setDate(periodFrom.getDate() - 1)
+  return periodFrom.toISOString().slice(0, 10)
+}
+
+const renderCharts = async (region, periodFrom) => {
+  await Promise.all([renderRatesChart(region, new Date(periodFrom)), renderCostChart(region, new Date(periodFrom))])
+}
 
 const nextRateChange = () => {
   const now = new Date()
@@ -372,18 +428,14 @@ const nextRateChange = () => {
   return nextInterval - now
 }
 
-const onload = async (ratesChartElementValue, costChartElementValue, regionElementValue, periodFromElementValue) => {
+const onload = async (ratesChartElementValue, costChartElementValue, periodFromElement, region) => {
   ratesChartElement = ratesChartElementValue
   costChartElement = costChartElementValue
-  periodFromElement = periodFromElementValue
-  regionElement = regionElementValue
-  loadRegion()
-  loadPeriodFrom()
-  renderCharts()
+  renderCharts(region, periodFromElement.value)
   setTimeout(() => {
-    renderCharts()
+    renderCharts(region, periodFromElement.value)
     setInterval(() => {
-      renderCharts()
+      renderCharts(region, periodFromElement.value)
     }, 1800000)
   }, nextRateChange())
 }

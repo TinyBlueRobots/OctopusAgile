@@ -1,8 +1,8 @@
 @root = https://api.octopus.energy/v1
 @accountId = A-B8F15377
 @token = 
-@period_from = 2024-12-01
-@period_to = 2024-12-02
+@period_from = 2024-12-22
+@period_to = 2024-12-23
 
 ###
 # @name products
