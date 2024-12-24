@@ -43,7 +43,7 @@
   <header class="section">
     <h1 class="title has-text-centered">Octopus Agile Price & Consumption Tracker</h1>
   </header>
-  <main class="box has-background-inherit" data-signals-maxperiodfrom="periodfrom && getMaxPeriodFrom()" data-signals-periodfrom="maxperiodfrom.value" data-signals-account="''" data-signals-token="''" data-signals-region="getRegion() || 'A'" data-persist="account token region" data-on-load="onload(rateschart.value, costchart.value, region.value, periodfrom.value)">
+  <main class="box has-background-inherit" data-computed-nextdatedisabled="periodfrom.value == maxperiodfrom.value" data-computed-maxperiodfrom="periodfrom.value && getMaxPeriodFrom()" data-signals-periodfrom="getMaxPeriodFrom()" data-signals-account="''" data-signals-token="''" data-signals-region="getRegion() || 'A'" data-persist="account token region" data-on-load="onload(rateschart.value, costchart.value, region.value, periodfrom.value)">
     <div class="columns">
       <div class="column is-11">
         <div class="field">
@@ -73,7 +73,7 @@
           <label for="periodfrom" class="label">Date</label>
           <span data-on-click="periodfrom.value = setPreviousDay(periodfrom.value); renderCharts(region.value, periodfrom.value)" class="button has-background-inherit">&lt;&lt;</span>
           <input id="periodfrom" type="date" data-bind-periodfrom data-attributes-max="maxperiodfrom.value" class="button has-background-inherit" data-on-change="renderCharts(region.value, periodfrom.value)" />
-          <span data-on-click="periodfrom.value = setNextDay(periodfrom.value, maxperiodfrom.value); renderCharts(region.value, periodfrom.value)" class="button has-background-inherit">&gt;&gt;</span>
+          <span data-on-click="periodfrom.value = setNextDay(periodfrom.value, maxperiodfrom.value); renderCharts(region.value, periodfrom.value)" class="button has-background-inherit" data-attributes-disabled="nextdatedisabled.value">&gt;&gt;</span>
         </div>
       </div>
       <div class="column">
