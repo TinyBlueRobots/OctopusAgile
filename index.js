@@ -22,7 +22,7 @@ const getStorageValue = (key) => {
   return JSON.parse(value)[key]
 }
 
-const getRegion = () => getStorageValue('region') || 'A'
+const getRegion = () => getStorageValue('region')
 
 const getAccount = () => getStorageValue('account')
 

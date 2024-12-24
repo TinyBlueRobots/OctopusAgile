@@ -7,7 +7,7 @@
   <meta name="keywords" content="Octopus Energy, Agile Prices, Energy Consumption, Energy Tracker, Octopus Agile, Energy Prices, Consumption Tracker">
   <meta name="author" content="Tiny Blue Robots">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
-  <script type="module" src="datastar.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@develop/bundles/datastar.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   <script src="index.js"></script>
   <style>
@@ -43,7 +43,7 @@
   <header class="section">
     <h1 class="title has-text-centered">Octopus Agile Price & Consumption Tracker</h1>
   </header>
-  <main class="box has-background-inherit" data-signals-account="''" data-signals-token="''" data-signals-region="getRegion()" data-persist="account token region" data-on-load="setInitialPeriodFrom(periodfrom.value); onload(rateschart.value, costchart.value, periodfrom.value, region.value)">
+  <main class="box has-background-inherit" data-signals-account="''" data-signals-token="''" data-signals-region="getRegion() || 'A'" data-persist="account token region" data-on-load="setInitialPeriodFrom(periodfrom.value); onload(rateschart.value, costchart.value, periodfrom.value, region.value)">
     <div class="columns">
       <div class="column is-11">
         <div class="field">
