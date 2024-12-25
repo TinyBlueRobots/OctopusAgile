@@ -60,13 +60,14 @@ const nextRateChange = () => {
 export const renderCharts = (region: string, periodFromValue: string) =>
   charts.render(region, periodFromValue, getAccount(), getToken())
 
-export const dispatchRenderCharts = (mainElement: HTMLElement) => mainElement.dispatchEvent(new Event('render-charts'))
-
 export const onload = (mainElement: HTMLElement, ratesChartElement: HTMLElement, costChartElement: HTMLElement) => {
+  const dispatchRenderCharts = (mainElement: HTMLElement) => () => mainElement.dispatchEvent(new Event('render-charts'))
   charts.setElements(ratesChartElement, costChartElement)
-  dispatchRenderCharts(mainElement)
+  const dispatchRenderChartsApplied = dispatchRenderCharts(mainElement)
+  dispatchRenderChartsApplied()
   setTimeout(() => {
-    dispatchRenderCharts(mainElement)
-    setInterval(() => dispatchRenderCharts(mainElement), 1800000)
+    dispatchRenderChartsApplied()
+    setInterval(() => dispatchRenderChartsApplied(), 1800000)
   }, nextRateChange())
+  return dispatchRenderChartsApplied
 }
