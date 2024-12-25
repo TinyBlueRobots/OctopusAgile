@@ -1,3 +1,4 @@
+import { main } from 'bun'
 import * as charts from './charts.js'
 import { getAccountData } from './octopus.js'
 
@@ -59,10 +60,13 @@ const nextRateChange = () => {
 export const renderCharts = (region: string, periodFromValue: string) =>
   charts.render(region, periodFromValue, getAccount(), getToken())
 
+export const dispatchRenderCharts = (mainElement: HTMLElement) => mainElement.dispatchEvent(new Event('render-charts'))
+
 export const onload = (mainElement: HTMLElement, ratesChartElement: HTMLElement, costChartElement: HTMLElement) => {
   charts.setElements(ratesChartElement, costChartElement)
+  dispatchRenderCharts(mainElement)
   setTimeout(() => {
-    mainElement.dispatchEvent(new Event('reload'))
-    setInterval(() => mainElement.dispatchEvent(new Event('reload')), 1800000)
+    dispatchRenderCharts(mainElement)
+    setInterval(() => dispatchRenderCharts(mainElement), 1800000)
   }, nextRateChange())
 }
