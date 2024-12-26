@@ -45,7 +45,7 @@
   <header class="section">
     <h1 class="title has-text-centered">Octopus Agile Price & Consumption Tracker</h1>
   </header>
-  <main class="box has-background-inherit" data-ref-main data-computed-nextdatedisabled="periodfrom.value == maxperiodfrom.value" data-computed-maxperiodfrom="periodfrom.value && app.getMaxPeriodFrom()" data-signals-periodfrom="app.getMaxPeriodFrom()" data-signals-account="''" data-signals-token="''" data-signals-region="app.getRegion() || 'A'" data-persist="account token region" data-signals-rendercharts="() => {}" data-on-render-charts="app.renderCharts(region.value, periodfrom.value)" data-on-load="rendercharts.value = app.onload(main.value, rateschart.value, costchart.value)">
+  <main class="box has-background-inherit" data-ref-main data-computed-nextdatedisabled="periodfrom.value == maxperiodfrom.value" data-computed-maxperiodfrom="periodfrom.value && app.getMaxPeriodFrom()" data-signals-periodfrom="app.getMaxPeriodFrom()" data-signals-account="''" data-signals-token="''" data-signals-region="app.getRegion() || 'A'" data-persist="account token region" data-signals-rendercharts="() => app.renderCharts(region.value, periodfrom.value, account.value, token.value)" data-on-load="app.onload(rateschart.value, costchart.value, rendercharts.value)">
     <div class="columns">
       <div class="column is-11">
         <div class="field">

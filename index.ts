@@ -1,4 +1,3 @@
-import { main } from 'bun'
 import * as charts from './charts.js'
 import { getAccountData } from './octopus.js'
 
@@ -9,10 +8,6 @@ const getStorageValue = (key: string) => {
 }
 
 export const getRegion = () => getStorageValue('region')
-
-const getAccount = () => getStorageValue('account')
-
-const getToken = () => getStorageValue('token')
 
 export const signOut = charts.destroy
 
@@ -57,17 +52,14 @@ const nextRateChange = () => {
   return nextInterval.getTime() - now.getTime()
 }
 
-export const renderCharts = (region: string, periodFromValue: string) =>
-  charts.render(region, periodFromValue, getAccount(), getToken())
+export const renderCharts = (region: string, periodFromValue: string, account: string, token: string) =>
+  charts.render(region, periodFromValue, account, token)
 
-export const onload = (mainElement: HTMLElement, ratesChartElement: HTMLElement, costChartElement: HTMLElement) => {
-  const dispatchRenderCharts = (mainElement: HTMLElement) => () => mainElement.dispatchEvent(new Event('render-charts'))
+export const onload = (ratesChartElement: HTMLElement, costChartElement: HTMLElement, renderCharts: () => Promise<void>) => {
   charts.setElements(ratesChartElement, costChartElement)
-  const dispatchRenderChartsApplied = dispatchRenderCharts(mainElement)
-  dispatchRenderChartsApplied()
+  renderCharts()
   setTimeout(() => {
-    dispatchRenderChartsApplied()
-    setInterval(() => dispatchRenderChartsApplied(), 1800000)
+    renderCharts()
+    setInterval(() => renderCharts(), 1800000)
   }, nextRateChange())
-  return dispatchRenderChartsApplied
 }
