@@ -6,10 +6,10 @@
     "build": "bun build ./index.ts --outdir=build --minify"
   },
   "devDependencies": {
-    "@types/bun": "latest",
+    "@types/bun": "^1.1.14",
     "apexcharts": "^4.3.0"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.7.2"
   }
 }
