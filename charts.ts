@@ -1,5 +1,5 @@
 import ApexCharts from 'apexcharts'
-import { getConsumptionCosts, getMeterConsumption, getRates, type Consumption } from './octopus'
+import { getMeterConsumption, getRates, type Consumption, type RegionUnitRate } from './octopus'
 
 let ratesChartInstance: ApexCharts | null
 let costChartInstance: ApexCharts | null
@@ -31,6 +31,22 @@ const times = (() => {
 
 const roundToTwoDecimals = (num: number): number => Math.round(num * 100) / 100
 
+const getConsumptionCosts = async (rates: RegionUnitRate[], meterConsumption: Consumption | null) => {
+  const ratesMap: { [key: string]: number } = {}
+  const consumptionCosts: Consumption = {}
+  for (const rate of rates) {
+    ratesMap[rate.valid_from] = rate.value_inc_vat
+  }
+  for (const serial_number in meterConsumption) {
+    consumptionCosts[serial_number] = {}
+    for (const [period, kwh] of Object.entries(meterConsumption[serial_number])) {
+      const ratesForPeriod = ratesMap[period] || 0
+      consumptionCosts[serial_number][period] = kwh * ratesForPeriod
+    }
+  }
+  return Object.keys(consumptionCosts).length ? consumptionCosts : null
+}
+
 const createRatesChartOptions = async (region: string, periodFrom: Date, consumption: Consumption | null) => {
   const rates = await getRates(region, periodFrom).then((rates) => rates.reverse())
   const prices = rates.map((rate) => roundToTwoDecimals(rate.value_inc_vat))
@@ -45,10 +61,25 @@ const createRatesChartOptions = async (region: string, periodFrom: Date, consump
     meterConsumptionCosts.reverse()
     if (meterConsumptionCosts) {
       series.push({
-        name: `Meter ${serial_number}`,
+        name: 'Cost',
         data: meterConsumptionCosts
       })
     }
+  }
+  let totalCost = 0
+  let totalKwh = 0
+  const averageKwhCost = [0]
+  for (const serial_number in consumption) {
+    for (const [period, kwh] of Object.entries(consumption[serial_number]).reverse().slice(0, 48)) {
+      const rate = rates.find((rate) => rate.valid_from == period)?.value_inc_vat || 0
+      totalCost = totalCost + kwh * rate
+      totalKwh = totalKwh + kwh
+      averageKwhCost.push(totalCost / totalKwh)
+    }
+    series.push({
+      name: `Cost per KwH : ${averageKwhCost[averageKwhCost.length - 1].toFixed(2)}`,
+      data: averageKwhCost.map(roundToTwoDecimals)
+    })
   }
   if (!Object.keys(consumptionCosts).length) {
     series.push({
@@ -77,7 +108,7 @@ const createRatesChartOptions = async (region: string, periodFrom: Date, consump
     })
   }
   const options: ApexCharts.ApexOptions = {
-    colors: ['rgb(250, 152, 255)', 'rgb(16, 195, 149)'],
+    colors: ['rgb(250, 152, 255)', 'rgb(16, 195, 149)', 'rgb(88, 64, 255)'],
     series,
     chart: {
       height: 300,
@@ -163,7 +194,7 @@ const createCostChartOptions = async (region: string, periodFrom: Date, consumpt
     }
     const costInPounds = costs[costs.length - 1] / 100
     series.push({
-      name: `Meter ${serial_number} : £${costInPounds.toFixed(2)}`,
+      name: `Cost : £${costInPounds.toFixed(2)}`,
       data: costs.map((cost) => roundToTwoDecimals(cost / 100))
     })
     for (const serial_number in consumption) {
@@ -172,14 +203,14 @@ const createCostChartOptions = async (region: string, periodFrom: Date, consumpt
         kwhs.push(kwh + currentKwh)
       }
       series.push({
-        name: `Meter ${serial_number} : ${kwhs[kwhs.length - 1].toFixed(2)} kWh`,
+        name: `KwH : ${kwhs[kwhs.length - 1].toFixed(2)}`,
         data: kwhs.map(roundToTwoDecimals)
       })
     }
   }
   const costTimes = times.slice(1)
   const options = {
-    colors: ['rgb(250, 152, 255)', 'rgb(16, 195, 149)'],
+    colors: ['rgb(250, 152, 255)', 'rgb(16, 195, 149)', 'rgb(88, 64, 255)'],
     series,
     chart: {
       height: 300,
