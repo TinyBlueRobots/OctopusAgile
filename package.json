@@ -3,7 +3,7 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "build": "bun build ./index.ts --outdir=build --minify"
+    "build": "bun run ./build.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.1.14",
