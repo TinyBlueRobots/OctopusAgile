@@ -31,7 +31,7 @@ type TariffData = {
   }
 }
 
-type RegionUnitRate = {
+export type RegionUnitRate = {
   valid_from: string
   value_inc_vat: number
 }
@@ -129,18 +129,4 @@ export const getRates = async (region: string, periodFrom: Date) => {
   }))
 }
 
-export const getConsumptionCosts = async (rates: RegionUnitRate[], meterConsumption: Consumption | null) => {
-  const ratesMap: { [key: string]: number } = {}
-  const consumptionCosts: Consumption = {}
-  for (const rate of rates) {
-    ratesMap[rate.valid_from] = rate.value_inc_vat
-  }
-  for (const serial_number in meterConsumption) {
-    consumptionCosts[serial_number] = {}
-    for (const [period, kwh] of Object.entries(meterConsumption[serial_number])) {
-      const ratesForPeriod = ratesMap[period] || 0
-      consumptionCosts[serial_number][period] = kwh * ratesForPeriod
-    }
-  }
-  return Object.keys(consumptionCosts).length ? consumptionCosts : null
-}
+
