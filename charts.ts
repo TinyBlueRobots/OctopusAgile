@@ -77,7 +77,7 @@ const createRatesChartOptions = async (region: string, periodFrom: Date, consump
       averageKwhCost.push(totalCost / totalKwh)
     }
     series.push({
-      name: `Cost per KwH : ${averageKwhCost[averageKwhCost.length - 1].toFixed(2)}`,
+      name: 'Cost per KwH',
       data: averageKwhCost.map(roundToTwoDecimals)
     })
   }
