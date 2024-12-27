@@ -8,7 +8,7 @@
   <meta name="author" content="Tiny Blue Robots">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
   <script type="module">
-    import * as app from '/build/16dex19c.js'
+    import * as app from '/build/7q9nd29x.js'
     window.app = app
   </script>
   <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@develop/bundles/datastar.js"></script>
@@ -45,7 +45,7 @@
   <header class="section">
     <h1 class="title has-text-centered">Octopus Agile Price & Consumption Tracker</h1>
   </header>
-  <main class="box has-background-inherit" data-ref-main data-computed-nextdatedisabled="periodfrom.value == maxperiodfrom.value" data-computed-maxperiodfrom="periodfrom.value && app.getMaxPeriodFrom()" data-signals-periodfrom="app.getMaxPeriodFrom()" data-signals-account="''" data-signals-token="''" data-signals-region="app.getRegion() || 'A'" data-persist="account token region" data-signals-rendercharts="() => app.renderCharts(region.value, periodfrom.value, account.value, token.value)" data-on-load="app.onload(rateschart.value, costchart.value, rendercharts.value)">
+  <main class="box has-background-inherit" data-replace-url="`?periodfrom=${periodfrom.value}`" data-computed-nextdatedisabled="periodfrom.value == maxperiodfrom.value" data-computed-maxperiodfrom="periodfrom.value && app.getMaxPeriodFrom()" data-signals-periodfrom="app.getMaxPeriodFrom(window.location.search)" data-signals-account="app.getAccount()" data-signals-token="app.getToken()" data-signals-region="app.getRegion() || 'A'" data-persist="account token region" data-signals-rendercharts="() => app.renderCharts(region.value, periodfrom.value, account.value, token.value)" data-on-load="app.onload(rateschart.value, costchart.value, rendercharts.value)">
     <div class="columns">
       <div class="column is-11">
         <div class="field">

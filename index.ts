@@ -9,6 +9,10 @@ const getStorageValue = (key: string) => {
 
 export const getRegion = () => getStorageValue('region')
 
+export const getAccount = () => getStorageValue('account')
+
+export const getToken = () => getStorageValue('token')
+
 export const signOut = charts.destroy
 
 export const signIn = async (account: string, token: string) => {
@@ -21,7 +25,11 @@ export const signIn = async (account: string, token: string) => {
   return false
 }
 
-export const getMaxPeriodFrom = () => {
+export const getMaxPeriodFrom = (query?: string) => {
+  const queryPeriodFrom = query && new URLSearchParams(query).get('periodfrom')
+  if (queryPeriodFrom) {
+    return queryPeriodFrom
+  }
   const periodFrom = new Date()
   if (periodFrom.getHours() >= 16) {
     periodFrom.setDate(periodFrom.getDate() + 1)
@@ -52,10 +60,15 @@ const nextRateChange = () => {
   return nextInterval.getTime() - now.getTime()
 }
 
-export const renderCharts = (region: string, periodFromValue: string, account: string, token: string) =>
+export const renderCharts = (region: string, periodFromValue: string, account: string, token: string) => {
   charts.render(region, periodFromValue, account, token)
+}
 
-export const onload = (ratesChartElement: HTMLElement, costChartElement: HTMLElement, renderCharts: () => Promise<void>) => {
+export const onload = (
+  ratesChartElement: HTMLElement,
+  costChartElement: HTMLElement,
+  renderCharts: () => Promise<void>
+) => {
   charts.setElements(ratesChartElement, costChartElement)
   renderCharts()
   setTimeout(() => {
