@@ -11,11 +11,12 @@ type AccountData = {
 type MeterData = {
   results: {
     consumption: number
+    interval_start: string
     interval_end: string
   }[]
 }
 
-export type Consumption = { [serialNumber: string]: { [period: string]: number } }
+export type Consumption = { [serialNumber: string]: { periodFrom: Date; periodTo: Date; value: number }[] }
 
 type Tariffs = {
   results: {
@@ -31,14 +32,14 @@ type TariffData = {
   }
 }
 
-export type RegionUnitRate = {
-  valid_from: string
-  value_inc_vat: number
+type RegionUnitRates = {
+  results: {
+    valid_from: string
+    value_inc_vat: number
+  }[]
 }
 
-type RegionUnitRates = {
-  results: RegionUnitRate[]
-}
+export type Rate = { periodFrom: Date; price: number }
 
 const apiCache: { [key: string]: string } = {}
 const apiRoot = 'https://api.octopus.energy/v1/'
@@ -91,10 +92,19 @@ export const getMeterConsumption = async (account: string, token: string, period
         token
       )
       if (meterData && meterData.results.length) {
-        meterConsumption[serialNumber] = {}
-        for (const { consumption, interval_end } of meterData.results) {
-          meterConsumption[serialNumber][interval_end] = consumption
+        meterConsumption[serialNumber] = []
+        for (const { consumption, interval_start, interval_end } of meterData.results) {
+          meterConsumption[serialNumber].push({
+            periodFrom: new Date(interval_start),
+            periodTo: new Date(interval_end),
+            value: consumption
+          })
         }
+        meterConsumption[serialNumber] = meterConsumption[serialNumber]
+          .sort(
+            ({ periodFrom: periodFrom1 }, { periodFrom: periodFrom2 }) => periodFrom1.getTime() - periodFrom2.getTime()
+          )
+          .slice(0, 48)
       }
     })
   )
@@ -123,10 +133,11 @@ export const getRates = async (region: string, periodFrom: Date) => {
     return []
   }
   const regionUnitRates = await getData<RegionUnitRates>(regionUnitRatesHref)
-  return regionUnitRates.results.map(({ valid_from, value_inc_vat }) => ({
-    valid_from,
-    value_inc_vat
-  }))
+  return regionUnitRates.results.reverse().map(
+    ({ valid_from, value_inc_vat }) =>
+      ({
+        periodFrom: new Date(valid_from),
+        price: value_inc_vat
+      } as Rate)
+  )
 }
-
-
