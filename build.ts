@@ -1,7 +1,7 @@
 const output = await Bun.build({
   entrypoints: ['./index.ts'],
   outdir: './build',
-  // minify: true,
+  minify: true,
   naming: '[dir]/[hash].[ext]'
 })
 if (output.outputs.length === 0) throw new Error('No outputs')
