@@ -45,7 +45,7 @@
   <header class="section">
     <h1 class="title has-text-centered">Octopus Agile Price & Consumption Tracker</h1>
   </header>
-  <main class="box has-background-inherit" data-replace-url="`?periodfrom=${periodfrom.value}`" data-computed-nextdatedisabled="periodfrom.value == maxperiodfrom.value" data-computed-maxperiodfrom="periodfrom.value && app.getMaxPeriodFrom()" data-signals-periodfrom="app.getMaxPeriodFrom(window.location.search)" data-signals-account="app.getAccount()" data-signals-token="app.getToken()" data-signals-region="app.getRegion() || 'A'" data-persist="account token region" data-signals-rendercharts="() => app.renderCharts(region.value, periodfrom.value, account.value, token.value)" data-on-load="app.onload(rateschart.value, costchart.value, rendercharts.value)">
+  <main class="box has-background-inherit" data-replace-url="periodfrom.value != new Date().toISOString().split('T')[0] ? `?periodfrom=${periodfrom.value}` : '/'" data-computed-nextdatedisabled="periodfrom.value == maxperiodfrom.value" data-computed-maxperiodfrom="periodfrom.value && app.getMaxPeriodFrom()" data-signals-periodfrom="app.getMaxPeriodFrom(window.location.search)" data-signals-account="app.getAccount()" data-signals-token="app.getToken()" data-signals-region="app.getRegion() || 'A'" data-persist="account token region" data-signals-rendercharts="() => app.renderCharts(region.value, periodfrom.value, account.value, token.value)" data-on-load="app.onload(rateschart.value, costchart.value, rendercharts.value)">
     <div class="columns">
       <div class="column is-11">
         <div class="field">
