@@ -39,7 +39,7 @@ const getConsumptionCosts = async (rates: Rate[], meterConsumption: Consumption 
 const createRatesChartOptions = async (region: string, periodFrom: Date, meterConsumption: Consumption | null) => {
   const rates = await getRates(region, periodFrom)
   const prices = rates.map((rate) => roundToTwoDecimals(rate.price))
-  const series: ApexAxisChartSeries = [{ name: 'Price', data: prices }]
+  const series: ApexAxisChartSeries = [{ name: 'Price per KwH', data: prices }]
   const consumptionCosts = (await getConsumptionCosts(rates, meterConsumption)) || {}
   for (const serial_number in consumptionCosts) {
     const meterConsumptionCosts = [0]
@@ -141,7 +141,7 @@ const createRatesChartOptions = async (region: string, periodFrom: Date, meterCo
     },
     yaxis: {
       title: {
-        text: 'Price',
+        text: 'Pence',
         style: {
           color: 'azure'
         }
@@ -244,7 +244,7 @@ const createCostChartOptions = async (region: string, periodFrom: Date, consumpt
     yaxis: [
       {
         title: {
-          text: 'Cost',
+          text: 'Pounds',
           style: {
             color: 'azure'
           }
