@@ -38,12 +38,16 @@
     a {
       color: rgb(250, 152, 255) !important;
     }
+
+    header a {
+      color: azure !important;
+    }
   </style>
 </head>
 
 <body class="container">
   <header class="section">
-    <h1 class="title has-text-centered">Octopus Agile Price & Consumption Tracker</h1>
+    <h1 class="title has-text-centered"><a href="/">Octopus Agile Price & Consumption Tracker</a></h1>
   </header>
   <main class="box has-background-inherit" data-replace-url="periodfrom.value != new Date().toISOString().split('T')[0] ? `?periodfrom=${periodfrom.value}` : '/'" data-computed-nextdatedisabled="periodfrom.value == maxperiodfrom.value" data-computed-maxperiodfrom="periodfrom.value && app.getMaxPeriodFrom()" data-signals-periodfrom="app.getMaxPeriodFrom(window.location.search)" data-signals-account="app.getAccount()" data-signals-token="app.getToken()" data-signals-region="app.getRegion() || 'A'" data-persist="account token region" data-signals-rendercharts="() => app.renderCharts(region.value, periodfrom.value, account.value, token.value)" data-on-load="app.onload(rateschart.value, costchart.value, rendercharts.value)">
     <div class="columns">
