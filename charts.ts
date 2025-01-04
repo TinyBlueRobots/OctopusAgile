@@ -1,4 +1,4 @@
-import ApexCharts from 'apexcharts'
+import ApexCharts, { type ApexOptions } from 'apexcharts'
 import { getMeterConsumption, getRates, type Consumption, type Rate } from './octopus'
 
 let ratesChartInstance: ApexCharts | null
@@ -39,7 +39,7 @@ const getConsumptionCosts = async (rates: Rate[], meterConsumption: Consumption 
 const createRatesChartOptions = async (region: string, periodFrom: Date, meterConsumption: Consumption | null) => {
   const rates = await getRates(region, periodFrom)
   const prices = rates.map((rate) => roundToTwoDecimals(rate.price))
-  const series: ApexAxisChartSeries = [{ name: 'Price per KwH', data: prices }]
+  const series: ApexAxisChartSeries = [{ name: 'Price per kWh', data: prices }]
   const consumptionCosts = (await getConsumptionCosts(rates, meterConsumption)) || {}
   for (const serial_number in consumptionCosts) {
     const meterConsumptionCosts = [0]
@@ -52,21 +52,6 @@ const createRatesChartOptions = async (region: string, periodFrom: Date, meterCo
         data: meterConsumptionCosts
       })
     }
-  }
-  let totalCost = 0
-  let totalKwh = 0
-  const averageKwhCost = [0]
-  for (const serial_number in meterConsumption) {
-    for (const consumption of meterConsumption[serial_number]) {
-      const price = rates.find((rate) => rate.periodFrom.getTime() == consumption.periodFrom.getTime())?.price || 0
-      totalCost = totalCost + consumption.value * price
-      totalKwh = totalKwh + consumption.value
-      averageKwhCost.push(totalCost / totalKwh)
-    }
-    series.push({
-      name: 'Avg KwH cost',
-      data: averageKwhCost.map(roundToTwoDecimals)
-    })
   }
   if (!Object.keys(consumptionCosts).length) {
     series.push({
@@ -97,12 +82,12 @@ const createRatesChartOptions = async (region: string, periodFrom: Date, meterCo
       }
     })
   }
-  const options: ApexCharts.ApexOptions = {
-    colors: ['rgb(250, 152, 255)', 'rgb(16, 195, 149)', 'rgb(88, 64, 255)'],
+  const options: ApexOptions = {
+    colors: ['rgb(250, 152, 255)', 'rgb(16, 195, 149)'],
     series,
     chart: {
       height: 300,
-      type: 'line',
+      type: 'bar',
       zoom: {
         enabled: false
       }
@@ -159,7 +144,6 @@ const createRatesChartOptions = async (region: string, periodFrom: Date, meterCo
 }
 
 const renderRatesChart = async (region: string, periodFrom: Date, account?: string, token?: string) => {
-  document.body.style.cursor = 'wait'
   const consumption = account && token ? await getMeterConsumption(account, token, periodFrom) : null
   const chartOptions = await createRatesChartOptions(region, periodFrom, consumption)
   if (!ratesChartInstance) {
@@ -168,7 +152,6 @@ const renderRatesChart = async (region: string, periodFrom: Date, account?: stri
   } else {
     ratesChartInstance.updateOptions(chartOptions)
   }
-  document.body.style.cursor = 'default'
 }
 
 const createCostChartOptions = async (region: string, periodFrom: Date, consumption: Consumption) => {
@@ -184,7 +167,7 @@ const createCostChartOptions = async (region: string, periodFrom: Date, consumpt
     }
     const costInPounds = costs[costs.length - 1] / 100
     series.push({
-      name: `Cost : £${costInPounds.toFixed(2)}`,
+      name: 'Cost',
       data: costs.map((cost) => roundToTwoDecimals(cost / 100))
     })
     for (const serial_number in consumption) {
@@ -193,13 +176,13 @@ const createCostChartOptions = async (region: string, periodFrom: Date, consumpt
         kwhs.push(value.value + currentKwh)
       }
       series.push({
-        name: `KwH : ${kwhs[kwhs.length - 1].toFixed(2)}`,
+        name: 'kWh',
         data: kwhs.map(roundToTwoDecimals)
       })
     }
   }
   const times = rates.map(({ periodFrom }) => periodFrom.toISOString().slice(11, 16))
-  const options = {
+  const options: ApexOptions = {
     colors: ['rgb(250, 152, 255)', 'rgb(16, 195, 149)', 'rgb(88, 64, 255)'],
     series,
     chart: {
@@ -227,7 +210,7 @@ const createCostChartOptions = async (region: string, periodFrom: Date, consumpt
       width: 2
     },
     title: {
-      text: 'Total Cost & KwH',
+      text: 'Total Cost & kWh',
       align: 'center',
       style: {
         color: 'azure'
@@ -262,7 +245,7 @@ const createCostChartOptions = async (region: string, periodFrom: Date, consumpt
       {
         opposite: true,
         title: {
-          text: 'KwH',
+          text: 'kWh',
           style: {
             color: 'azure'
           }
@@ -284,29 +267,30 @@ const createCostChartOptions = async (region: string, periodFrom: Date, consumpt
 }
 
 const renderCostChart = async (region: string, periodFrom: Date, account?: string, token?: string) => {
-  document.body.style.cursor = 'wait'
   const consumption = account && token ? await getMeterConsumption(account, token, periodFrom) : null
   if (!consumption) {
     costChartInstance && costChartInstance.destroy()
     costChartInstance = null
-    document.body.style.cursor = 'default'
     return
   }
-  const chartOptions = Object.keys(consumption).length
-    ? await createCostChartOptions(region, periodFrom, consumption)
-    : {}
+  const chartOptions = await createCostChartOptions(region, periodFrom, consumption)
   if (!costChartInstance) {
     costChartInstance = new ApexCharts(costChartElement, chartOptions)
     await costChartInstance.render()
   } else {
     costChartInstance.updateOptions(chartOptions)
   }
-  document.body.style.cursor = 'default'
+  const kwhData = (chartOptions.series as ApexAxisChartSeries).find((series) => series.name === 'kWh')?.data as number[]
+  const totalKwh = kwhData[kwhData.length - 1]
+  const costData = (chartOptions.series as ApexAxisChartSeries).find((series) => series.name === 'Cost')
+    ?.data as number[]
+  const totalCost = costData[costData.length - 1]
+  const averageKwhCost = (totalCost / totalKwh).toFixed(2)
+  return { averageKwhCost, totalCost, totalKwh }
 }
 
 export const render = async (region: string, periodFromValue: string, account?: string, token?: string) => {
-  await Promise.all([
-    renderRatesChart(region, new Date(periodFromValue), account, token),
-    renderCostChart(region, new Date(periodFromValue), account, token)
-  ])
+  renderRatesChart(region, new Date(periodFromValue), account, token)
+  const totals = await renderCostChart(region, new Date(periodFromValue), account, token)
+  return totals
 }

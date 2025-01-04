@@ -8,7 +8,7 @@
   <meta name="author" content="Tiny Blue Robots">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
   <script type="module">
-    import * as app from '/build/0v4hymnp.js'
+    import * as app from '/build/d22hhg04.js'
     window.app = app
   </script>
   <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.1/bundles/datastar.js"></script>
@@ -19,7 +19,7 @@
     .modal-card-body,
     .modal-card-foot,
     .button {
-      background-color: rgb(16, 0, 48) !important
+      background-color: rgb(16 0 48) !important
     }
 
     .button,
@@ -28,15 +28,24 @@
     }
 
     .button:hover {
-      border-color: rgb(250, 152, 255) !important;
+      border-color: rgb(240 80 248) !important;
     }
 
     #chart {
-      background-color: rgb(24, 0, 72);
+      background-color: rgb(24 0 72);
+    }
+
+    .tag {
+      background-color: rgb(88 64 255) !important;
+      color: azure !important;
+    }
+
+    .is-info {
+      background-color: rgb(240 80 248) !important;
     }
 
     a {
-      color: rgb(250, 152, 255) !important;
+      color: rgb(240 80 248) !important;
     }
 
     header a {
@@ -49,7 +58,7 @@
   <header class="section">
     <h1 class="title has-text-centered"><a href="/">Octopus Agile Price & Consumption Tracker</a></h1>
   </header>
-  <main class="box has-background-inherit" data-replace-url="$periodfrom != new Date().toISOString().split('T')[0] ? `?periodfrom=${$periodfrom}` : '/'" data-computed-nextdatedisabled="$periodfrom == $maxperiodfrom" data-computed-maxperiodfrom="$periodfrom && app.getMaxPeriodFrom()" data-signals-periodfrom="app.getMaxPeriodFrom(window.location.search)" data-signals-account="app.getAccount()" data-signals-token="app.getToken()" data-signals-region="app.getRegion() || 'A'" data-persist="account token region" data-signals-rendercharts="() => app.renderCharts($region, $periodfrom, $account, $token)" data-on-load="app.onload($rateschart, $costchart, $rendercharts)">
+  <main class="box has-background-inherit" data-signals-totals="''" data-on-totalsupdated__window="$totals = evt.detail" data-replace-url="$periodfrom != new Date().toISOString().split('T')[0] ? `?periodfrom=${$periodfrom}` : '/'" data-computed-nextdatedisabled="$periodfrom == $maxperiodfrom" data-computed-maxperiodfrom="$periodfrom && app.getMaxPeriodFrom()" data-signals-periodfrom="app.getMaxPeriodFrom(window.location.search)" data-signals-account="app.getAccount()" data-signals-token="app.getToken()" data-signals-region="app.getRegion() || 'A'" data-persist="account token region" data-signals-rendercharts="() => app.renderCharts($region, $periodfrom, $account, $token)" data-on-load="app.onload($rateschart, $costchart, $rendercharts)">
     <div class="columns">
       <div class="column is-11">
         <div class="field">
@@ -89,6 +98,26 @@
         </div>
         <button class="button" data-class-is-hidden="$account" data-on-click="$signinmodalactive = true">Sign In</button>
         <button class="button" data-class-is-hidden="!$account" data-on-click="$account = $token = ''; app.signOut(); $rendercharts()">Sign Out</button>
+      </div>
+    </div>
+    <div class="field is-grouped is-grouped-multiline" data-class-is-hidden="!$totals">
+      <div class="control">
+        <div class="tags has-addons">
+          <span class="tag">Total cost</span>
+          <span class="tag is-info" data-text="`£${$totals.totalCost}`"></span>
+        </div>
+      </div>
+      <div class="control">
+        <div class="tags has-addons">
+          <span class="tag">Total kWh</span>
+          <span class="tag is-info" data-text="`${$totals.totalKwh}`"></span>
+        </div>
+      </div>
+      <div class="control">
+        <div class="tags has-addons">
+          <span class="tag">Average kWh cost</span>
+          <span class="tag is-info" data-text="`£${$totals.averageKwhCost}`"></span>
+        </div>
       </div>
     </div>
     <div data-ref-rateschart></div>

@@ -60,8 +60,11 @@ const nextRateChange = () => {
   return nextInterval.getTime() - now.getTime()
 }
 
-export const renderCharts = (region: string, periodFromValue: string, account: string, token: string) => {
-  charts.render(region, periodFromValue, account, token)
+export const renderCharts = async (region: string, periodFromValue: string, account: string, token: string) => {
+  document.body.style.cursor = 'wait'
+  const totals = (await charts.render(region, periodFromValue, account, token)) || ''
+  window.dispatchEvent(new CustomEvent('totalsupdated', { detail: totals }))
+  document.body.style.cursor = 'default'
 }
 
 export const onload = (
