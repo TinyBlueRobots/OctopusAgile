@@ -25,11 +25,7 @@ export const signIn = async (account: string, token: string) => {
   return false
 }
 
-export const getMaxPeriodFrom = (query?: string) => {
-  const queryPeriodFrom = query && new URLSearchParams(query).get('periodfrom')
-  if (queryPeriodFrom) {
-    return queryPeriodFrom
-  }
+export const getMaxPeriodFrom = () => {
   const periodFrom = new Date()
   if (periodFrom.getHours() >= 16) {
     periodFrom.setDate(periodFrom.getDate() + 1)
@@ -62,6 +58,8 @@ const nextRateChange = () => {
 
 export const renderCharts = async (region: string, periodFromValue: string, account: string, token: string) => {
   document.body.style.cursor = 'wait'
+  account = account || getAccount()
+  token = token || getToken()
   const totals = (await charts.render(region, periodFromValue, account, token)) || ''
   window.dispatchEvent(new CustomEvent('totalsupdated', { detail: totals }))
   document.body.style.cursor = 'default'

@@ -8,7 +8,7 @@
   <meta name="author" content="Tiny Blue Robots">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
   <script type="module">
-    import * as app from '/build/d22hhg04.js'
+    import * as app from '/build/r0rzz752.js'
     window.app = app
   </script>
   <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.1/bundles/datastar.js"></script>
@@ -65,7 +65,7 @@
   <header class="section">
     <h1 class="title has-text-centered"><a href="/">Octopus Agile Daily Price & Consumption Tracker</a></h1>
   </header>
-  <main class="box has-background-inherit" data-signals-totals="''" data-on-totalsupdated__window="$totals = evt.detail" data-replace-url="$periodfrom != new Date().toISOString().split('T')[0] ? `?periodfrom=${$periodfrom}` : '/'" data-computed-nextdatedisabled="$periodfrom == $maxperiodfrom" data-computed-maxperiodfrom="$periodfrom && app.getMaxPeriodFrom()" data-signals-periodfrom="app.getMaxPeriodFrom(window.location.search)" data-signals-account="app.getAccount()" data-signals-token="app.getToken()" data-signals-region="app.getRegion() || 'A'" data-persist="account token region" data-signals-rendercharts="() => app.renderCharts($region, $periodfrom, $account, $token)" data-on-load="app.onload($rateschart, $costchart, $rendercharts)">
+  <main class="box has-background-inherit" data-signals-totals="''" data-on-totalsupdated__window="$totals = evt.detail" data-replace-url="$periodfrom != new Date().toISOString().split('T')[0] ? `?periodfrom=${$periodfrom}` : '/'" data-computed-nextdatedisabled="$periodfrom == $maxperiodfrom" data-signals-periodfrom="new URLSearchParams(window.location.search).get('periodfrom') || app.getMaxPeriodFrom()" data-computed-maxperiodfrom="$periodfrom && app.getMaxPeriodFrom()" data-signals-account="app.getAccount()" data-signals-token="app.getToken()" data-signals-region="app.getRegion() || 'A'" data-persist="account token region" data-on-load="app.onload($rateschart, $costchart, $rendercharts)" data-signals-rendercharts="() => app.renderCharts($region, $periodfrom)" >
     <div class="columns">
       <div class="column is-11">
         <div class="field">
@@ -94,8 +94,8 @@
         <div class="field">
           <label for="periodfrom" class="label">Date</label>
           <span data-on-click="$periodfrom = app.setPreviousDay($periodfrom); $rendercharts()" class="button has-background-inherit">&lt;&lt;</span>
-          <input id="periodfrom" type="date" data-bind-periodfrom data-attributes-max="$maxperiodfrom" class="button has-background-inherit" data-on-change="app.renderCharts($region, $periodfrom)" />
-          <span data-on-click="$periodfrom = app.setNextDay($periodfrom, $maxperiodfrom); $rendercharts()" class="button has-background-inherit" data-attributes-disabled="$nextdatedisabled">&gt;&gt;</span>
+          <input id="periodfrom" type="date" data-bind-periodfrom data-attr-max="$maxperiodfrom" class="button has-background-inherit" data-on-change="app.renderCharts($region, $periodfrom)" />
+          <span data-on-click="$periodfrom = app.setNextDay($periodfrom, $maxperiodfrom); $rendercharts()" class="button has-background-inherit" data-attr-disabled="$nextdatedisabled">&gt;&gt;</span>
         </div>
       </div>
       <div class="column">
