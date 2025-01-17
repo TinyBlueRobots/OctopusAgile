@@ -58,8 +58,8 @@ const nextRateChange = () => {
 
 export const renderCharts = async (region: string, periodFromValue: string, account: string, token: string) => {
   document.body.style.cursor = 'wait'
-  account = account || getAccount()
-  token = token || getToken()
+  account ??= getAccount()
+  token ??= getToken()
   const totals = (await charts.render(region, periodFromValue, account, token)) || ''
   window.dispatchEvent(new CustomEvent('totalsupdated', { detail: totals }))
   document.body.style.cursor = 'default'
