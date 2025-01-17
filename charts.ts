@@ -146,12 +146,20 @@ const createRatesChartOptions = async (region: string, periodFrom: Date, meterCo
 const renderRatesChart = async (region: string, periodFrom: Date, account?: string, token?: string) => {
   const consumption = account && token ? await getMeterConsumption(account, token, periodFrom) : null
   const chartOptions = await createRatesChartOptions(region, periodFrom, consumption)
+  const priceData =
+    (chartOptions &&
+      (chartOptions.series as ApexAxisChartSeries)
+        .find((series) => series.name === 'Price per kWh')
+        ?.data.map((price) => price as number)) ||
+    []
+  const averageKwhPrice = (priceData.reduce((acc, price) => acc + price, 0) / priceData.length).toFixed(2)
   if (!ratesChartInstance) {
     ratesChartInstance = new ApexCharts(ratesChartElement, chartOptions)
     await ratesChartInstance.render()
   } else {
     ratesChartInstance.updateOptions(chartOptions)
   }
+  return averageKwhPrice
 }
 
 const createCostChartOptions = async (region: string, periodFrom: Date, consumption: Consumption) => {
@@ -286,11 +294,11 @@ const renderCostChart = async (region: string, periodFrom: Date, account?: strin
     ?.data as number[]
   const totalCost = costData[costData.length - 1]
   const averageKwhCost = (totalCost / totalKwh).toFixed(2)
-  return { averageKwhCost, totalCost, totalKwh }
+  return { averageKwhCost, totalCost: totalCost.toFixed(2), totalKwh }
 }
 
 export const render = async (region: string, periodFromValue: string, account?: string, token?: string) => {
-  renderRatesChart(region, new Date(periodFromValue), account, token)
+  const averageKwhPrice = await renderRatesChart(region, new Date(periodFromValue), account, token)
   const totals = await renderCostChart(region, new Date(periodFromValue), account, token)
-  return totals
+  return { averageKwhPrice, ...totals }
 }
