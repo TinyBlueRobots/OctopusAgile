@@ -293,7 +293,7 @@ const renderCostChart = async (region: string, periodFrom: Date, account?: strin
   const costData = (chartOptions.series as ApexAxisChartSeries).find((series) => series.name === 'Cost')
     ?.data as number[]
   const totalCost = costData[costData.length - 1]
-  const averageKwhCost = (totalCost / totalKwh).toFixed(2)
+  const averageKwhCost = ((totalCost / totalKwh) * 100).toFixed(2)
   return { averageKwhCost, totalCost: totalCost.toFixed(2), totalKwh }
 }
 
