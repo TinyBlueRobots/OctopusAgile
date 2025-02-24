@@ -11,7 +11,7 @@
     import * as app from '/build/wcqd97kb.js'
     window.app = app
   </script>
-  <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.1/bundles/datastar.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.7/bundles/datastar.js"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-6T17K877ZY"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -65,7 +65,7 @@
   <header class="section">
     <h1 class="title has-text-centered"><a href="/">Octopus Agile Daily Price & Consumption Tracker</a></h1>
   </header>
-  <main class="box has-background-inherit" data-signals-totals="''" data-on-totalsupdated__window="$totals = evt.detail" data-replace-url="$periodfrom != new Date().toISOString().split('T')[0] ? `?periodfrom=${$periodfrom}` : '/'" data-computed-nextdatedisabled="$periodfrom == $maxperiodfrom" data-signals-periodfrom="new URLSearchParams(window.location.search).get('periodfrom') || app.getMaxPeriodFrom()" data-computed-maxperiodfrom="$periodfrom && app.getMaxPeriodFrom()" data-signals-account="app.getAccount()" data-signals-token="app.getToken()" data-signals-region="app.getRegion() || 'A'" data-persist="account token region" data-on-load="app.onload($rateschart, $costchart, $rendercharts)" data-signals-rendercharts="() => app.renderCharts($region, $periodfrom)" >
+  <main class="box has-background-inherit" data-signals-totals="''" data-on-totalsupdated__window="$totals = evt.detail" data-signals-periodfrom="new URLSearchParams(window.location.search).get('periodfrom') || app.getMaxPeriodFrom()" data-computed-maxperiodfrom="$periodfrom && app.getMaxPeriodFrom()" data-replace-url="$periodfrom != new Date().toISOString().split('T')[0] ? `?periodfrom=${$periodfrom}` : '/'" data-computed-nextdatedisabled="$periodfrom == $maxperiodfrom" data-signals-account="app.getAccount()" data-signals-token="app.getToken()" data-signals-region="app.getRegion() || 'A'" data-persist="account token region" data-signals-rendercharts="() => app.renderCharts($region, $periodfrom)" >
     <div class="columns">
       <div class="column is-11">
         <div class="field">
@@ -104,7 +104,7 @@
           <span data-text="$account"></span>
         </div>
         <button class="button" data-class-is-hidden="$account" data-on-click="$signinmodalactive = true">Sign In</button>
-        <button class="button" data-class-is-hidden="!$account" data-on-click="$account = $token = ''; app.signOut(); $rendercharts()">Sign Out</button>
+        <button class="button" data-class-is-hidden="!$account" data-on-click="$account = $token = '';app.signOut(); $rendercharts()">Sign Out</button>
       </div>
     </div>
     <div class="field is-grouped is-grouped-multiline" data-class-is-hidden="!$totals">
@@ -135,7 +135,7 @@
     </div>
     <div data-ref-rateschart></div>
     <br>
-    <div data-ref-costchart></div>
+    <div data-ref-costchart data-on-load="app.onload($rateschart, $costchart, $rendercharts)"></div>
   </main>
   <footer class="footer has-background-inherit">
     <div class="has-text-centered box has-background-inherit">
