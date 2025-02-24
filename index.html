@@ -99,34 +99,34 @@
         </div>
       </div>
       <div class="column">
-        <div class="field" data-class-is-hidden="!$account">
+        <div class="field" data-class-is-hidden__case.kebab="!$account">
           <label class="label">Account</label>
           <span data-text="$account"></span>
         </div>
-        <button class="button" data-class-is-hidden="$account" data-on-click="$signinmodalactive = true">Sign In</button>
-        <button class="button" data-class-is-hidden="!$account" data-on-click="$account = $token = '';app.signOut(); $rendercharts()">Sign Out</button>
+        <button class="button" data-class-is-hidden__case.kebab="$account" data-on-click="$signinmodalactive = true">Sign In</button>
+        <button class="button" data-class-is-hidden__case.kebab="!$account" data-on-click="$account = $token = ''; app.signOut(); $rendercharts()">Sign Out</button>
       </div>
     </div>
-    <div class="field is-grouped is-grouped-multiline" data-class-is-hidden="!$totals">
-      <div class="control" data-class-is-hidden="!$totals.totalCost">
+    <div class="field is-grouped is-grouped-multiline" data-class-is-hidden__case.kebab="!$totals">
+      <div class="control" data-class-is-hidden__case.kebab="!$totals.totalCost">
         <div class="tags has-addons">
           <span class="tag">Total cost</span>
           <span class="tag is-info" data-text="`£${$totals.totalCost}`"></span>
         </div>
       </div>
-      <div class="control" data-class-is-hidden="!$totals.totalKwh">
+      <div class="control" data-class-is-hidden__case.kebab="!$totals.totalKwh">
         <div class="tags has-addons">
           <span class="tag">Total kWh</span>
           <span class="tag is-info" data-text="`${$totals.totalKwh}`"></span>
         </div>
       </div>
-      <div class="control" data-class-is-hidden="!$totals.averageKwhCost">
+      <div class="control" data-class-is-hidden__case.kebab="!$totals.averageKwhCost">
         <div class="tags has-addons">
           <span class="tag">Average kWh cost</span>
           <span class="tag is-info" data-text="`${$totals.averageKwhCost}p`"></span>
         </div>
       </div>
-      <div class="control" data-class-is-hidden="!$totals.averageKwhPrice">
+      <div class="control" data-class-is-hidden__case.kebab="!$totals.averageKwhPrice">
         <div class="tags has-addons">
           <span class="tag">Average kWh price</span>
           <span class="tag is-info" data-text="`${$totals.averageKwhPrice}p`"></span>
@@ -145,7 +145,7 @@
       <p>
         This site is not affiliated with Octopus Energy. It uses the <a href="https://developer.octopus.energy" target="_blank">Octopus Energy API</a> to display Agile tariff prices and consumption data.
       </p>
-      <p data-class-is-hidden="$account">
+      <p data-class-is-hidden__case.kebab="$account">
         <a href="#" data-on-click="$signinmodalactive = true">Sign in</a> to see your consumption data. Your account and token will only be stored in your browser's local storage.
       </p>
       <p>
@@ -153,7 +153,7 @@
       </p>
     </div>
   </footer>
-  <div class="modal" data-bind-signinmodalactive data-class-is-active="$signinmodalactive">
+  <div class="modal" data-bind-signinmodalactive data-class-is-active__case.kebab="$signinmodalactive">
     <div class="modal-background"></div>
     <div class="modal-card">
       <header class="modal-card-head">
