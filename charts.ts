@@ -30,7 +30,7 @@ const getConsumptionCosts = async (rates: Rate[], meterConsumption: Consumption 
       consumptionCosts[serial_number].push([consumption.periodTo, consumption.value * ratesForPeriod])
     }
     consumptionCosts[serial_number] = consumptionCosts[serial_number].sort(
-      ([periodFrom1, _], [periodFrom2, __]) => periodFrom1.getTime() - periodFrom2.getTime()
+      ([periodFrom1, _], [periodFrom2, __]) => periodFrom1.getTime() - periodFrom2.getTime(),
     )
   }
   return Object.keys(consumptionCosts).length ? consumptionCosts : null
@@ -49,14 +49,14 @@ const createRatesChartOptions = async (region: string, periodFrom: Date, meterCo
     if (meterConsumptionCosts) {
       series.push({
         name: 'Cost',
-        data: meterConsumptionCosts
+        data: meterConsumptionCosts,
       })
     }
   }
   if (!Object.keys(consumptionCosts).length) {
     series.push({
       name: 'Meter data not available',
-      data: Array(prices.length).fill(0)
+      data: Array(prices.length).fill(0),
     })
   }
   let times = Object.keys(consumptionCosts).length
@@ -76,10 +76,10 @@ const createRatesChartOptions = async (region: string, periodFrom: Date, meterCo
         style: {
           fontSize: '14px',
           color: 'azure',
-          background: 'rgb(250, 152, 255)'
+          background: 'rgb(250, 152, 255)',
         },
-        text: `${currentRate.price}`
-      }
+        text: `${currentRate.price}`,
+      },
     })
   }
   const options: ApexOptions = {
@@ -89,55 +89,55 @@ const createRatesChartOptions = async (region: string, periodFrom: Date, meterCo
       height: 300,
       type: 'bar',
       zoom: {
-        enabled: false
-      }
+        enabled: false,
+      },
     },
     legend: {
       show: true,
       showForSingleSeries: true,
       labels: {
-        colors: 'azure'
-      }
+        colors: 'azure',
+      },
     },
     dataLabels: {
-      enabled: false
+      enabled: false,
     },
     grid: {
-      strokeDashArray: 3
+      strokeDashArray: 3,
     },
     stroke: {
       curve: 'straight',
-      width: 2
+      width: 2,
     },
     title: {
       text: Object.keys(consumptionCosts).length ? 'Price & Cost per ½ hour' : 'Price per ½ hour',
       align: 'center',
       style: {
-        color: 'azure'
-      }
+        color: 'azure',
+      },
     },
     xaxis: {
       categories: times,
       labels: {
         style: {
-          colors: 'azure'
-        }
-      }
+          colors: 'azure',
+        },
+      },
     },
     yaxis: {
       title: {
         text: 'Pence',
         style: {
-          color: 'azure'
-        }
+          color: 'azure',
+        },
       },
       labels: {
         style: {
-          colors: 'azure'
-        }
-      }
+          colors: 'azure',
+        },
+      },
     },
-    annotations
+    annotations,
   }
 
   return options
@@ -176,7 +176,7 @@ const createCostChartOptions = async (region: string, periodFrom: Date, consumpt
     const costInPounds = costs[costs.length - 1] / 100
     series.push({
       name: 'Cost',
-      data: costs.map((cost) => roundToTwoDecimals(cost / 100))
+      data: costs.map((cost) => roundToTwoDecimals(cost / 100)),
     })
     for (const serial_number in consumption) {
       for (const value of consumption[serial_number]) {
@@ -185,7 +185,7 @@ const createCostChartOptions = async (region: string, periodFrom: Date, consumpt
       }
       series.push({
         name: 'kWh',
-        data: kwhs.map(roundToTwoDecimals)
+        data: kwhs.map(roundToTwoDecimals),
       })
     }
   }
@@ -197,78 +197,78 @@ const createCostChartOptions = async (region: string, periodFrom: Date, consumpt
       height: 300,
       type: 'bar',
       zoom: {
-        enabled: false
-      }
+        enabled: false,
+      },
     },
     legend: {
       show: true,
       showForSingleSeries: true,
       labels: {
-        colors: 'azure'
-      }
+        colors: 'azure',
+      },
     },
     dataLabels: {
-      enabled: false
+      enabled: false,
     },
     grid: {
-      strokeDashArray: 3
+      strokeDashArray: 3,
     },
     stroke: {
       curve: 'straight',
-      width: 2
+      width: 2,
     },
     title: {
       text: 'Total Cost & kWh',
       align: 'center',
       style: {
-        color: 'azure'
-      }
+        color: 'azure',
+      },
     },
     xaxis: {
       categories: times,
       labels: {
         style: {
-          colors: 'azure'
-        }
-      }
+          colors: 'azure',
+        },
+      },
     },
     yaxis: [
       {
         title: {
           text: 'Pounds',
           style: {
-            color: 'azure'
-          }
+            color: 'azure',
+          },
         },
         axisBorder: {
           show: true,
-          color: 'rgb(250, 152, 255)'
+          color: 'rgb(250, 152, 255)',
         },
         labels: {
           style: {
-            colors: 'azure'
-          }
-        }
+            colors: 'azure',
+          },
+        },
       },
       {
         opposite: true,
         title: {
           text: 'kWh',
           style: {
-            color: 'azure'
-          }
+            color: 'azure',
+          },
         },
         axisBorder: {
           show: true,
-          color: 'rgb(16, 195, 149)'
+          color: 'rgb(16, 195, 149)',
         },
         labels: {
           style: {
-            colors: 'azure'
-          }
-        }
-      }
-    ]
+            colors: 'azure',
+          },
+        },
+      },
+    ],
   }
 
   return options

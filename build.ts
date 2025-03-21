@@ -2,7 +2,7 @@ const output = await Bun.build({
   entrypoints: ['./index.ts'],
   outdir: './build',
   minify: true,
-  naming: '[dir]/[hash].[ext]'
+  naming: '[dir]/[hash].[ext]',
 })
 if (output.outputs.length === 0) throw new Error('No outputs')
 const buildFile = `${output.outputs[0].hash}.js`

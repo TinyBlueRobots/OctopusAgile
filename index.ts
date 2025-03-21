@@ -68,7 +68,7 @@ export const renderCharts = async (region: string, periodFromValue: string, acco
 export const onload = (
   ratesChartElement: HTMLElement,
   costChartElement: HTMLElement,
-  renderCharts: () => Promise<void>
+  renderCharts: () => Promise<void>,
 ) => {
   charts.setElements(ratesChartElement, costChartElement)
   renderCharts()
