@@ -6,10 +6,10 @@
     "build": "bun run ./build.ts"
   },
   "devDependencies": {
-    "@types/bun": "^1.2.3",
+    "@types/bun": "^1.2.5",
     "apexcharts": "^4.5.0"
   },
   "peerDependencies": {
-    "typescript": "^5.7.3"
+    "typescript": "^5.8.2"
   }
 }
